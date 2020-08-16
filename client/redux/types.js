@@ -1,0 +1,6 @@
+const TYPES = {
+  INIT_SEARCH: 'INIT_SEARCH',
+  CLEAR_SEARCH: 'CLEAR_SEARCH'
+};
+
+export default TYPES;
