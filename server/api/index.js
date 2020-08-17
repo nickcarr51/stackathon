@@ -49,6 +49,27 @@ app.post('/api/initsearch', (req, res) => {
   })
 })
 
+app.post('/api/initsearchinfo', (req, res) => {
+  const { ids } = req.body;
+  axios.post(
+    'https://accounts.spotify.com/api/token',
+    qs.stringify(data),
+    headers
+  ).then(response => {
+    const accessToken = response.data.access_token;
+    axios.get(
+      `https://api.spotify.com/v1/audio-features/?ids=${ids}`,
+      {
+        headers: {
+          "Authorization": "Bearer " + accessToken
+        }
+      }
+    ).then(response => {
+      res.send(response.data.audio_features);
+    })
+  })
+})
+
 app.post('/api/gettrack', (req, res) => {
   const { id } = req.body;
   axios.post(
@@ -91,8 +112,74 @@ app.post('/api/getinfo', (req, res) => {
   })
 })
 
+// app.post('/api/checkkey', (req, res) => {
+//   const { id } = req.body;
+//   axios.post(
+//     'https://accounts.spotify.com/api/token',
+//     qs.stringify(data),
+//     headers
+//   ).then(response => {
+//     const accessToken = response.data.access_token;
+//     axios.get(
+//       `https://api.spotify.com/v1/audio-features/${id}`,
+//       {
+//         headers: {
+//           "Authorization": "Bearer " + accessToken
+//         }
+//       }
+//     ).then(response => {
+//       res.send(response.data);
+//     })
+//   })
+// })
+
+app.post('/api/getsimilar', (req, res) => {
+  const { id } = req.body;
+  axios.post(
+    'https://accounts.spotify.com/api/token',
+    qs.stringify(data),
+    headers
+  ).then(response => {
+    const accessToken = response.data.access_token;
+    axios.get(
+      `https://api.spotify.com/v1/recommendations?limit=100&seed_tracks=${id}`,
+      {
+        headers: {
+          "Authorization": "Bearer " + accessToken
+        }
+      }
+    ).then(response => {
+      res.send(response.data.tracks);
+    })
+  })
+})
+
+app.post('/api/getsimilarinfo', (req, res) => {
+  const { ids } = req.body;
+  axios.post(
+    'https://accounts.spotify.com/api/token',
+    qs.stringify(data),
+    headers
+  ).then(response => {
+    const accessToken = response.data.access_token
+    axios.get(
+      `https://api.spotify.com/v1/audio-features/?ids=${ids}`,
+      {
+        headers: {
+          "Authorization": "Bearer " + accessToken
+        }
+      }
+    ).then(response => {
+      res.send(response.data.audio_features);
+    })
+  })
+})
+
+// app.get('*', (req, res) => {
+//   res.sendFile(path.join(PUBLIC_PATH, '/index.html'));
+// });
 app.get('*', (req, res) => {
-  res.sendFile(path.join(PUBLIC_PATH, '/index.html'));
+  res.sendFile(path.join(__dirname, '../../public/index.html'));
 });
 
 app.listen(PORT, () => {

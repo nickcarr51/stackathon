@@ -11,7 +11,7 @@ const App = () => {
           <Switch>
             <Route exact path='/' render={(props) => <Search props={props} /> } />
             <Route path='/dig/:id?' render={(props) => <Dig props={props} /> } />
-            <Redirect from='*' to='/' />
+            <Redirect to='/' />
           </Switch>
         </HashRouter>
       </CssBaseline>

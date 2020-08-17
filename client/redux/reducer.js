@@ -4,9 +4,13 @@ import TYPES from './types';
 
 const initialState = {
   initSearchResults: [],
+  initSearchInfo: [],
   mainTrack: {},
   mainTrackInfo: {},
-  mainKey: {}
+  mainKey: {},
+  harmonicKeys: [],
+  allSimilar: [],
+  allSimilarInfo: [],
 }
 
 const reducer = (state = initialState, action) => {
@@ -15,6 +19,11 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         initSearchResults: action.results
+      }
+    case TYPES.INIT_SEARCH_INFO:
+      return {
+        ...state,
+        initSearchInfo: action.similar
       }
     case TYPES.CLEAR_SEARCH:
       return {
@@ -35,6 +44,21 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         mainKey: action.mainKey
+      }
+    case TYPES.GET_HARMONIC_KEYS:
+      return {
+        ...state,
+        harmonicKeys: action.harmonicKeys
+      }
+    case TYPES.GET_ALL_SIMILAR:
+      return {
+        ...state,
+        allSimilar: action.similar
+      }
+    case TYPES.ALL_SIMILAR_INFO:
+      return {
+        ...state,
+        allSimilarInfo: action.similar
       }
     default:
       return state;
