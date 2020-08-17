@@ -1,19 +1,19 @@
 import React from 'react';
-import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
+import { BrowserRouter, HashRouter, Route, Switch, Redirect } from 'react-router-dom';
 import { CssBaseline } from '@material-ui/core';
-import { Search } from './components/index';
+import { Search, Dig } from './components/index';
 
 const App = () => {
   return (
     <div>
       <CssBaseline>
-        <BrowserRouter>
+        <HashRouter>
           <Switch>
             <Route exact path='/' render={(props) => <Search props={props} /> } />
-            <Route path='/dig/:id?' render={(props) => <Search props={props} /> } />
-            <Redirect to='/' />
+            <Route path='/dig/:id?' render={(props) => <Dig props={props} /> } />
+            <Redirect from='*' to='/' />
           </Switch>
-        </BrowserRouter>
+        </HashRouter>
       </CssBaseline>
     </div>
   )

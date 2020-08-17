@@ -4,6 +4,9 @@ import TYPES from './types';
 
 const initialState = {
   initSearchResults: [],
+  mainTrack: {},
+  mainTrackInfo: {},
+  mainKey: {}
 }
 
 const reducer = (state = initialState, action) => {
@@ -17,6 +20,21 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         initSearchResults: [],
+      }
+    case TYPES.GET_MAIN_TRACK:
+      return {
+        ...state,
+        mainTrack: action.mainTrack
+      }
+    case TYPES.GET_MAIN_INFO:
+      return {
+        ...state,
+        mainTrackInfo: action.trackInfo
+      }
+    case TYPES.GET_MAIN_KEY:
+      return {
+        ...state,
+        mainKey: action.mainKey
       }
     default:
       return state;

@@ -28,29 +28,71 @@ const data = {
   grant_type: 'client_credentials',
 };
 
-app.post('/api/initsearch', async (req, res) => {
+app.post('/api/initsearch', (req, res) => {
   const { input } = req.body;
-  await axios.post(
+  axios.post(
     'https://accounts.spotify.com/api/token',
     qs.stringify(data),
     headers
-  ).then(async response => {
+  ).then(response => {
     const accessToken = response.data.access_token;
-    await axios.get(
+    axios.get(
       `https://api.spotify.com/v1/search?q=${ encodeURI(input) }&type=track`,
       {
-          headers: {
-              "Authorization": "Bearer " + accessToken
-          }
+        headers: {
+            "Authorization": "Bearer " + accessToken
+        }
       }
     ).then(response => {
       res.send(response.data.tracks.items);
+    })  
+  })
+})
+
+app.post('/api/gettrack', (req, res) => {
+  const { id } = req.body;
+  axios.post(
+    'https://accounts.spotify.com/api/token',
+    qs.stringify(data),
+    headers
+  ).then(response => {
+    const accessToken = response.data.access_token;
+    axios.get(
+      `https://api.spotify.com/v1/tracks/${id}`,
+      {
+        headers: {
+          "Authorization": "Bearer " + accessToken
+        }
+      }
+    ).then(response => {
+      res.send(response.data);
+    })
+  })
+})
+
+app.post('/api/getinfo', (req, res) => {
+  const { id } = req.body;
+  axios.post(
+    'https://accounts.spotify.com/api/token',
+    qs.stringify(data),
+    headers
+  ).then(response => {
+    const accessToken = response.data.access_token;
+    axios.get(
+      `https://api.spotify.com/v1/audio-features/${id}`,
+      {
+        headers: {
+          "Authorization": "Bearer " + accessToken
+        }
+      }
+    ).then(response => {
+      res.send(response.data);
     })
   })
 })
 
 app.get('*', (req, res) => {
-  res.sendFile(path.join(PUBLIC_PATH, './index.html'));
+  res.sendFile(path.join(PUBLIC_PATH, '/index.html'));
 });
 
 app.listen(PORT, () => {
