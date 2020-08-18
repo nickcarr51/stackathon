@@ -1,9 +1,11 @@
 import React, {useState, useEffect} from 'react';
 import { Button, Grid, Typography } from '@material-ui/core';
+import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 import { Link } from 'react-router-dom';
 import SpotifyPlayer from 'react-spotify-player';
 import { getKey } from 'camelot-wheel';
+import { addToPlaylist } from '../../redux/actions';
 
 const useStyles = makeStyles(theme => ({
   link: {
@@ -27,11 +29,18 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const SearchSongCard = ({ track, trackInfo }) => {
+const SearchSongCard = ({ track, trackInfo, addToPlaylist }) => {
   const [currKey, setCurrKey] = useState({})
+  
   useEffect(() => {
     setCurrKey(getKey({pitchClass: trackInfo.key, mode: trackInfo.mode }))
   },[])
+
+  const handleAdd = (e) => {
+    e.preventDefault();
+    addToPlaylist(track, trackInfo, currKey);
+  }
+
   const classes = useStyles();
   return (
     // <div className={classes.card}>
@@ -71,11 +80,11 @@ const SearchSongCard = ({ track, trackInfo }) => {
               variant='h6'
               className={classes.tempoKey}
             >{Math.floor(trackInfo.tempo)}{' '}BPM</Typography>
-          <Button variant="contained" className={classes.button}>Add</Button>
+          <Button onClick={handleAdd} variant="contained" className={classes.button}>Add</Button>
         </Grid>
       </Grid>
     // </div>
   )
 }
 
-export default SearchSongCard;
+export default connect(null, { addToPlaylist })(SearchSongCard);

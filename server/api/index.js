@@ -2,13 +2,40 @@ require('dotenv').config();
 const path = require('path');
 const express = require('express');
 const chalk = require('chalk');
+const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const app = require('./server');
 const axios = require('axios').default;
 const qs = require('qs')
+const { db, Session, Song } = require('../db/db');
 
 const PORT = process.env.PORT || 3000;
 const PUBLIC_PATH = path.join(__dirname, '../../public');
 const DIST_PATH = path.join(__dirname, '../../dist');
+
+app.use(cookieParser());
+
+app.use(async (req, res, next) => {
+  if (!req.cookies.session_id) {
+    const session = await Session.create();
+
+    const oneWeek = 1000 * 60 * 60 * 24 * 7;
+
+    res.cookie('session_id', session.id, {
+      path: '/',
+      expires: new Date(Date.now() + oneWeek),
+    });
+
+    req.session_id = session.id;
+
+    next();
+  } else {
+    req.session_id = req.cookies.session_id;
+
+    next();
+  }
+});
+
 
 app.use(express.json());
 app.use(express.static(PUBLIC_PATH));
@@ -175,6 +202,36 @@ app.post('/api/getsimilarinfo', (req, res) => {
   })
 })
 
+app.post('/api/addtoplaylist', async (req, res) => {
+  const { track, trackInfo, currKey } = req.body;
+  let camelotKey;
+  console.log(currKey);
+  if (currKey.mode === 0) {
+    camelotKey = currKey.camelotPosition + 'A'
+  } else {
+    camelotKey = currKey.camelotPosition + 'B'
+  }
+  const song = await Song.create({
+    name: track.name,
+    id: track.id,
+    artists: track.artists.map(artist => artist.name),
+    energy: trackInfo.energy,
+    danceability: trackInfo.danceability,
+    key: currKey.name,
+    camelotKey: camelotKey,
+    tempo: Math.floor(trackInfo.tempo),
+    sessionId: req.session_id
+  })
+
+  res.send(song);
+})
+
+app.get('/api/getplaylist', async (req, res) => {
+  const playlist = await Song.findAll({ where: { sessionId: req.session_id }});
+  console.log(playlist);
+  res.send(playlist);
+})
+
 // app.get('*', (req, res) => {
 //   res.sendFile(path.join(PUBLIC_PATH, '/index.html'));
 // });
@@ -182,6 +239,10 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../../public/index.html'));
 });
 
-app.listen(PORT, () => {
-  console.log(chalk.greenBright(`Server is now listening on PORT:${PORT}`));
-});
+db.sync()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(chalk.greenBright(`Server is now listening on PORT:${PORT}`));
+    });
+  })
+

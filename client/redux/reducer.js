@@ -11,6 +11,7 @@ const initialState = {
   harmonicKeys: [],
   allSimilar: [],
   allSimilarInfo: [],
+  currPlaylist: [],
 }
 
 const reducer = (state = initialState, action) => {
@@ -59,6 +60,16 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         allSimilarInfo: action.similar
+      }
+    case TYPES.ADD_TO_PLAYLIST:
+      return {
+        ...state,
+        currPlaylist: [...state.currPlaylist, action.track]
+      }
+    case TYPES.GET_PLAYLIST:
+      return {
+        ...state,
+        currPlaylist: action.playlist
       }
     default:
       return state;

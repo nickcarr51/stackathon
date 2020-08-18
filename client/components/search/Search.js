@@ -5,6 +5,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Box, Paper, TextField, Button, Grid } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import SearchResults from './searchResults';
+import Playlist from '../playlist/playlist';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -79,6 +80,7 @@ const Search = ({ initSearch, initSearchResults, initSearchInfo, clearSearch}) =
             }
         </Paper>
       </Grid>
+      <Playlist />
     </Grid>
   )
 }

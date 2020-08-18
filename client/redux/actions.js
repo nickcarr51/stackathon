@@ -77,3 +77,24 @@ export const clearSearch = () => (dispatch) => {
     type: TYPES.CLEAR_SEARCH,
   })
 }
+
+export const addToPlaylist = (track, trackInfo, currKey) => (dispatch) => {
+  axios.post('/api/addtoplaylist', { track, trackInfo, currKey })
+    .then(res => {
+      dispatch({
+        type: TYPES.ADD_TO_PLAYLIST,
+        track: res.data,
+      })
+    })
+}
+
+export const getPlaylist = () => (dispatch) => {
+  console.log('ACTION CALLED');
+  axios.get('/api/getplaylist')
+    .then(res => {
+      dispatch({
+        type: TYPES.GET_PLAYLIST,
+        playlist: res.data
+      })
+    })
+}

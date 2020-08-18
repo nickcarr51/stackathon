@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import { getInfo, getTrack, getSimilar } from '../../redux/actions';
 import { makeStyles } from '@material-ui/core/styles';
-import { Box, Paper, Grid, Tabs, Tab, Button } from '@material-ui/core';
+import { Box, Paper, Grid, Tabs, Tab, Button, Typography } from '@material-ui/core';
 import SearchResults from '../search/searchResults';
+import SpotifyPlayer from 'react-spotify-player';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -20,6 +21,9 @@ const useStyles = makeStyles((theme) => ({
   },
   tab: {
     textTransform: 'none'
+  },
+  mainTrackContainer: {
+    padding: '10px'
   }
 }))
 
@@ -59,7 +63,8 @@ const Dig = ({ props, getTrack, getInfo, getSimilar, mainTrack, mainTrackInfo, m
       justify='center'
       style={{ minHeight: '100vh' }}
     >
-      <Grid
+      {mainTrack && mainTrackInfo && mainKey && harmonicKeys.length && allSimilar.length && allSimilarInfo.length && 
+        <Grid
         item
         lg={5}
         md={8}
@@ -67,15 +72,17 @@ const Dig = ({ props, getTrack, getInfo, getSimilar, mainTrack, mainTrackInfo, m
         // style={{ width: '80%' }}
       >
         <Paper className={classes.paper}>
-        <Grid container spacing={3}>
-          <Grid item xs={12}>
-            <h1>{mainTrack.name}</h1>
+        <Grid className={classes.mainTrackContainer} container spacing={3}>
+          <Grid item xs={10}>
+            <Typography variant='h6'>{mainTrack.artists.map(artist => artist.name).join(', ')}</Typography>
+            <Typography variant='h4'>{mainTrack.name}</Typography>
+            <div>
+              <SpotifyPlayer uri={mainTrack.uri} size='compact' view='coverart' theme='white' />
+            </div>
           </Grid>
-          <Grid item xs={6}>
-            <h2>{ mainKey.name }/{mainKey.camelotPosition}{mainKey.mode === 0 ? 'A' : 'B'}</h2>
-          </Grid>
-          <Grid item xs={6}>
-            <h2>{ Math.floor(mainTrackInfo.tempo)}{' '}BPM</h2>
+          <Grid container item direction='column' justify='space-between' xs={2}>
+            <Typography variant='h6'>{ mainKey.name }/{mainKey.camelotPosition}{mainKey.mode === 0 ? 'A' : 'B'}</Typography>
+            <Typography variant='h6'>{ Math.floor(mainTrackInfo.tempo)}{' '}BPM</Typography>
           </Grid>
         </Grid>
           <Tabs
@@ -191,6 +198,8 @@ const Dig = ({ props, getTrack, getInfo, getSimilar, mainTrack, mainTrackInfo, m
         <Button onClick={() => props.history.push('/')}>Back</Button>
       </Paper>
       </Grid>
+      }
+      
     </Grid>
   )
 }
