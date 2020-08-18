@@ -1,6 +1,7 @@
 import React from 'react';
 import { Paper, Button, Grid } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import PlaylistCard from './playlistCard';
 
 const useStyles = makeStyles(theme => ({
   paper: {
@@ -22,7 +23,8 @@ const useStyles = makeStyles(theme => ({
     marginRight: '20px',
   },
   gridItem: {
-    height: '150px'
+    height: '150px',
+    margin: '10px 0px'
   }
 }));
 
@@ -47,7 +49,7 @@ const PlaylistResults = ({ currPlaylist }) => {
             return (
             <Grid key={track.id} item xs={12} className={classes.gridItem}>
               <Paper elevation={3}>
-                <h1>{track.name}</h1>
+                <PlaylistCard track={track} />
               </Paper>
             </Grid>
             )

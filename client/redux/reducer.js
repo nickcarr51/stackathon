@@ -64,12 +64,22 @@ const reducer = (state = initialState, action) => {
     case TYPES.ADD_TO_PLAYLIST:
       return {
         ...state,
-        currPlaylist: [...state.currPlaylist, action.track]
+        currPlaylist: [...state.currPlaylist, action.track],
       }
     case TYPES.GET_PLAYLIST:
       return {
         ...state,
         currPlaylist: action.playlist
+      }
+    case TYPES.DELETE_FROM_PLAYLIST:
+      return {
+        ...state,
+        currPlaylist: state.currPlaylist.filter(track => track.id !== action.deletedTrack)
+      }
+    case TYPES.CLEAR_PLAYLIST:
+      return {
+        ...state,
+        currPlaylist: []
       }
     default:
       return state;

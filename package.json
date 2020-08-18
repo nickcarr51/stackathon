@@ -23,6 +23,7 @@
   "homepage": "https://github.com/nickcarr51/stackathon#readme",
   "devDependencies": {
     "@babel/core": "^7.11.1",
+    "@babel/plugin-proposal-class-properties": "^7.10.4",
     "@babel/preset-react": "^7.10.4",
     "babel-loader": "^8.1.0",
     "webpack": "^4.44.1",
@@ -33,6 +34,7 @@
     "@material-ui/icons": "^4.9.1",
     "axios": "^0.19.2",
     "camelot-wheel": "^0.2.3",
+    "canvasjs": "^1.8.3",
     "chalk": "^4.1.0",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
@@ -48,6 +50,7 @@
     "react-spotify-player": "^1.0.4",
     "redux": "^4.0.5",
     "redux-thunk": "^2.3.0",
-    "sequelize": "^6.3.4"
+    "sequelize": "^6.3.4",
+    "spotify-web-api-js": "^1.5.0"
   }
 }

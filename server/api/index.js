@@ -36,8 +36,8 @@ app.use(async (req, res, next) => {
   }
 });
 
-
 app.use(express.json());
+app.use(cors());
 app.use(express.static(PUBLIC_PATH));
 app.use(express.static(DIST_PATH));
 
@@ -139,27 +139,6 @@ app.post('/api/getinfo', (req, res) => {
   })
 })
 
-// app.post('/api/checkkey', (req, res) => {
-//   const { id } = req.body;
-//   axios.post(
-//     'https://accounts.spotify.com/api/token',
-//     qs.stringify(data),
-//     headers
-//   ).then(response => {
-//     const accessToken = response.data.access_token;
-//     axios.get(
-//       `https://api.spotify.com/v1/audio-features/${id}`,
-//       {
-//         headers: {
-//           "Authorization": "Bearer " + accessToken
-//         }
-//       }
-//     ).then(response => {
-//       res.send(response.data);
-//     })
-//   })
-// })
-
 app.post('/api/getsimilar', (req, res) => {
   const { id } = req.body;
   axios.post(
@@ -205,7 +184,6 @@ app.post('/api/getsimilarinfo', (req, res) => {
 app.post('/api/addtoplaylist', async (req, res) => {
   const { track, trackInfo, currKey } = req.body;
   let camelotKey;
-  console.log(currKey);
   if (currKey.mode === 0) {
     camelotKey = currKey.camelotPosition + 'A'
   } else {
@@ -228,9 +206,32 @@ app.post('/api/addtoplaylist', async (req, res) => {
 
 app.get('/api/getplaylist', async (req, res) => {
   const playlist = await Song.findAll({ where: { sessionId: req.session_id }});
-  console.log(playlist);
   res.send(playlist);
 })
+
+app.delete('/api/deletefromplaylist/:id', async (req, res) => {
+  const { id } = req.params;
+  await Song.destroy({ where: { id: id, sessionId: req.session_id }});
+  res.send(id);
+})
+
+app.delete('/api/clearplaylist', async (req, res) => {
+  await Song.destroy({ where: { sessionId: req.session_id }});
+  res.sendStatus(200);
+})
+
+//this is directly from the spotify docs, first time around this does redirect correctly to the spotify login page, then redirects the page to the callback url with the accesstoken in the hash,
+//which breaks the page.  I've tried different callback urls, I've double checked the callback url on the developer dashboard, I've modified and tried different routes to get to callback (exact path vs path, etc.)
+
+app.get('/login', (req, res) => {
+  const scopes = 'user-read-private user-read-email';
+  res.redirect('https://accounts.spotify.com/authorize' +
+    '?response_type=code' +
+    '&client_id=' + process.env.SPOTIFY_KEY +
+    (scopes ? '&scope=' + encodeURIComponent(scopes) : '') +
+    '&redirect_uri=' + encodeURIComponent('https://localhost:3000/callback'));
+  // res.sendStatus(200)
+});
 
 // app.get('*', (req, res) => {
 //   res.sendFile(path.join(PUBLIC_PATH, '/index.html'));

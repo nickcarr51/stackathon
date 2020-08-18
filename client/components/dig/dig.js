@@ -1,19 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
-import { getInfo, getTrack, getSimilar } from '../../redux/actions';
+import { getInfo, getTrack, getSimilar, getPlaylist } from '../../redux/actions';
 import { makeStyles } from '@material-ui/core/styles';
 import { Box, Paper, Grid, Tabs, Tab, Button, Typography } from '@material-ui/core';
 import SearchResults from '../search/searchResults';
+import Playlist from '../playlist/playlist';
 import SpotifyPlayer from 'react-spotify-player';
+import SongEnergy from '../songEnergyChart/songEnergy';
+import SongDanceability from '../songEnergyChart/danceabilityChart';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
-    marginTop: theme.spacing(3),
-    marginBotom: theme.spacing(3),
-    padding: theme.spacing(4),
-    display: 'flex',
-    flexDirection: 'column',
-    height: '600px'
+    // marginTop: theme.spacing(3),
+    // marginBotom: theme.spacing(3),
+    // padding: theme.spacing(4),
+    // display: 'flex',
+    // flexDirection: 'column',
+    // height: '600px'
   },
   box: {
     margin: '0 auto',
@@ -27,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }))
 
-const Dig = ({ props, getTrack, getInfo, getSimilar, mainTrack, mainTrackInfo, mainKey, harmonicKeys, allSimilar, allSimilarInfo }) => {
+const Dig = ({ props, getTrack, getInfo, getSimilar, getPlaylist, mainTrack, mainTrackInfo, mainKey, harmonicKeys, allSimilar, allSimilarInfo, currPlaylist }) => {
   const [selectedTab, setSelectedTab] = useState(0);
 
   useEffect(() => {
@@ -41,6 +44,10 @@ const Dig = ({ props, getTrack, getInfo, getSimilar, mainTrack, mainTrackInfo, m
   useEffect(() => {
     getSimilar(props.match.params.id, harmonicKeys);
   },[props.match.params.id])
+
+  useEffect(() => {
+    getPlaylist()
+  },[currPlaylist.length])
 
   const handleTabChange = (event, newValue) => {
     setSelectedTab(newValue);
@@ -69,7 +76,7 @@ const Dig = ({ props, getTrack, getInfo, getSimilar, mainTrack, mainTrackInfo, m
         lg={5}
         md={8}
         sm={12}
-        // style={{ width: '80%' }}
+        style={{ width: '80%' }}
       >
         <Paper className={classes.paper}>
         <Grid className={classes.mainTrackContainer} container spacing={3}>
@@ -199,7 +206,39 @@ const Dig = ({ props, getTrack, getInfo, getSimilar, mainTrack, mainTrackInfo, m
       </Paper>
       </Grid>
       }
-      
+      {
+        currPlaylist.length
+        ? <Grid container direction='column' alignItems='center' justify='center'>
+            <Grid         
+              item
+              lg={5}
+              md={8}
+              sm={12}
+              style={{ width: '80%' }}
+              >
+              <SongEnergy currPlaylist={currPlaylist} />
+            </Grid>
+            <Grid         
+              item
+              lg={5}
+              md={8}
+              sm={12}
+              style={{ width: '80%' }}
+              >
+              <SongDanceability currPlaylist={currPlaylist} />
+            </Grid>
+            <Grid     
+              item
+              lg={5}
+              md={8}
+              sm={12}
+              style={{ width: '80%', marginBottom: '20px'}}
+              >
+              <Playlist />
+            </Grid>
+          </Grid>
+        : null
+      }
     </Grid>
   )
 }
@@ -210,11 +249,12 @@ const mapStateToProps = state => {
     mainKey: state.mainKey,
     harmonicKeys: state.harmonicKeys,
     allSimilar: state.allSimilar,
-    allSimilarInfo: state.allSimilarInfo
+    allSimilarInfo: state.allSimilarInfo,
+    currPlaylist: state.currPlaylist
   }
 }
 
-const mapDispatchToProps = { getInfo, getTrack, getSimilar }
+const mapDispatchToProps = { getInfo, getTrack, getSimilar, getPlaylist }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Dig);
 

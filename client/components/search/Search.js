@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { initSearch, clearSearch } from '../../redux/actions';
+import { initSearch, clearSearch, getPlaylist } from '../../redux/actions';
 import { makeStyles } from '@material-ui/core/styles';
 import { Box, Paper, TextField, Button, Grid } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import SearchResults from './searchResults';
 import Playlist from '../playlist/playlist';
+import SongEnergy from '../songEnergyChart/songEnergy';
+import SongDanceability from '../songEnergyChart/danceabilityChart';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -32,8 +34,12 @@ const useStyles = makeStyles((theme) => ({
   }
 }))
 
-const Search = ({ initSearch, initSearchResults, initSearchInfo, clearSearch}) => {
+const Search = ({ initSearch, initSearchResults, initSearchInfo, currPlaylist, clearSearch, getPlaylist}) => {
   const [input, setInput] = useState('');
+
+  useEffect(() => {
+    getPlaylist()
+  },[currPlaylist.length])
 
   const handleInput = (e) => {
     setInput(e.target.value)
@@ -80,7 +86,39 @@ const Search = ({ initSearch, initSearchResults, initSearchInfo, clearSearch}) =
             }
         </Paper>
       </Grid>
-      <Playlist />
+      {
+        currPlaylist.length
+        ? <Grid container direction='column' alignItems='center' justify='center'>
+            <Grid         
+              item
+              lg={5}
+              md={8}
+              sm={12}
+              style={{ width: '80%' }}
+              >
+              <SongEnergy currPlaylist={currPlaylist} />
+            </Grid>
+            <Grid         
+              item
+              lg={5}
+              md={8}
+              sm={12}
+              style={{ width: '80%' }}
+              >
+              <SongDanceability currPlaylist={currPlaylist} />
+            </Grid>
+            <Grid     
+              item
+              lg={5}
+              md={8}
+              sm={12}
+              style={{ width: '80%', marginBottom: '20px'}}
+              >
+              <Playlist />
+            </Grid>
+          </Grid>
+        : null
+      }
     </Grid>
   )
 }
@@ -88,11 +126,12 @@ const Search = ({ initSearch, initSearchResults, initSearchInfo, clearSearch}) =
 const mapStateToProps = (state) => {
   return {
     initSearchResults: state.initSearchResults,
-    initSearchInfo: state.initSearchInfo
+    initSearchInfo: state.initSearchInfo,
+    currPlaylist: state.currPlaylist
   }
 }
 
-const mapDispatchToProps = { initSearch, clearSearch };
+const mapDispatchToProps = { initSearch, clearSearch, getPlaylist };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Search);
 

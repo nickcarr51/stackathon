@@ -1,6 +1,7 @@
 import TYPES from './types';
 import { getKey, getHarmonicKeys } from 'camelot-wheel';
 
+
 const axios = require('axios');
 
 export const initSearch = (input) => (dispatch) => {
@@ -89,12 +90,37 @@ export const addToPlaylist = (track, trackInfo, currKey) => (dispatch) => {
 }
 
 export const getPlaylist = () => (dispatch) => {
-  console.log('ACTION CALLED');
   axios.get('/api/getplaylist')
     .then(res => {
       dispatch({
         type: TYPES.GET_PLAYLIST,
         playlist: res.data
       })
+    })
+}
+
+export const deleteFromPlaylist = (id) => (dispatch) => {
+  axios.delete(`/api/deletefromplaylist/${id}`)
+    .then(res => {
+      dispatch({
+        type: TYPES.DELETE_FROM_PLAYLIST,
+        deletedTrack: res.data
+      })
+    })
+}
+
+export const clearPlaylist = () => (dispatch) => {
+  axios.delete(`/api/clearplaylist`)
+    .then(res => {
+      dispatch({
+        type: TYPES.CLEAR_PLAYLIST,
+      })
+    })
+}
+
+export const login = () => (dispatch) => {
+  axios.get('/api/login')
+    .then(res => {
+      console.log(res);
     })
 }
