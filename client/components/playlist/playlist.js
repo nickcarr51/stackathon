@@ -22,13 +22,13 @@ const Playlist = ({ currPlaylist, getPlaylist, clearPlaylist, songEnergy }) => {
   console.log('CURRENT PLAYLIST', currPlaylist);
   console.log('CURRENT PLAYLIST', songEnergy);
   return (
-    // <Grid
-    // item
+    <Grid
+    item
     // lg={5}
     // md={8}
     // sm={12}
-    // style={{ width: '80%', marginBottom: '20px'}}
-    // >
+    style={{ width: '100%'}}
+    >
     <Paper>
       {
         currPlaylist.length &&
@@ -42,7 +42,7 @@ const Playlist = ({ currPlaylist, getPlaylist, clearPlaylist, songEnergy }) => {
         : null
       }
     </Paper>
-  // </Grid>
+  </Grid>
   )
 }
 

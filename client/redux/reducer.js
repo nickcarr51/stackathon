@@ -12,6 +12,7 @@ const initialState = {
   allSimilar: [],
   allSimilarInfo: [],
   currPlaylist: [],
+  camelot: false,
 }
 
 const reducer = (state = initialState, action) => {
@@ -80,6 +81,11 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         currPlaylist: []
+      }
+    case TYPES.TOGGLE_CAMELOT:
+      return {
+        ...state,
+        camelot: !state.camelot
       }
     default:
       return state;

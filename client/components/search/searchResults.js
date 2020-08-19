@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { connect } from 'react-redux';
 import { Paper, Button, Grid } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { Link } from 'react-router-dom';
@@ -28,7 +29,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const SearchResults = ({ results, resultsInfo }) => {
+const SearchResults = ({ results, resultsInfo, camelot }) => {
   const classes = useStyles();
   // console.log('RESULTSIINFO', resultsInfo);
   return (
@@ -59,7 +60,7 @@ const SearchResults = ({ results, resultsInfo }) => {
                   // >
                   <Grid key={track.id} item xs={12} className={classes.gridItem}>
                     <Paper className={classes.paper} elevation={3}>
-                      <SearchSongCard track={track} trackInfo={trackInfo} />
+                      <SearchSongCard track={track} trackInfo={trackInfo} camelot={camelot} />
                     </Paper>
                   </Grid>
                   // </div>
@@ -73,4 +74,10 @@ const SearchResults = ({ results, resultsInfo }) => {
   )
 }
 
-export default SearchResults;
+const mapStateToProps = state => {
+  return {
+    camelot: state.camelot,
+  }
+}
+
+export default connect(mapStateToProps, {})(SearchResults);

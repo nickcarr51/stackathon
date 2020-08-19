@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { initSearch, clearSearch, getPlaylist } from '../../redux/actions';
 import { makeStyles } from '@material-ui/core/styles';
-import { Box, Paper, TextField, Button, Grid } from '@material-ui/core';
+import { Paper, TextField, Button, Grid, Accordion, AccordionSummary, AccordionDetails, Typography } from '@material-ui/core';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import CloseIcon from '@material-ui/icons/Close';
 import SearchResults from './searchResults';
 import Playlist from '../playlist/playlist';
@@ -72,7 +73,7 @@ const Search = ({ initSearch, initSearchResults, initSearchInfo, currPlaylist, c
         lg={5}
         md={8}
         sm={12}
-        style={{ width: '80%'}}
+        style={{ width: '100%'}}
       >
         <Paper className={classes.paper}>
           <form className={classes.form} onSubmit={handleSubmit}>
@@ -89,32 +90,42 @@ const Search = ({ initSearch, initSearchResults, initSearchInfo, currPlaylist, c
       {
         currPlaylist.length
         ? <Grid container direction='column' alignItems='center' justify='center'>
-            <Grid         
-              item
-              lg={5}
-              md={8}
-              sm={12}
-              style={{ width: '80%' }}
-              >
-              <SongEnergy currPlaylist={currPlaylist} />
-            </Grid>
-            <Grid         
-              item
-              lg={5}
-              md={8}
-              sm={12}
-              style={{ width: '80%' }}
-              >
-              <SongDanceability currPlaylist={currPlaylist} />
-            </Grid>
             <Grid     
               item
               lg={5}
               md={8}
               sm={12}
-              style={{ width: '80%', marginBottom: '20px'}}
+              style={{ width: '100%', margin: '10px 0px'}}
               >
-              <Playlist />
+              <Accordion>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                  <Typography>Playlist</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Playlist />
+                </AccordionDetails>
+              </Accordion>
+            </Grid>
+            <Grid         
+              item
+              lg={5}
+              md={8}
+              sm={12}
+              style={{ width: '100%', margin: '10px 0px' }}
+              >
+              <Accordion>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                  <Typography>Insights</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Grid container direction='column'>
+                    <Typography>Energy</Typography>
+                    <SongEnergy currPlaylist={currPlaylist} />
+                    <Typography>Danceability</Typography>
+                    <SongDanceability currPlaylist={currPlaylist} />
+                  </Grid>
+                </AccordionDetails>
+              </Accordion>
             </Grid>
           </Grid>
         : null

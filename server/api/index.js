@@ -9,6 +9,7 @@ const axios = require('axios').default;
 const qs = require('qs')
 const { db, Session, Song } = require('../db/db');
 
+
 const PORT = process.env.PORT || 3000;
 const PUBLIC_PATH = path.join(__dirname, '../../public');
 const DIST_PATH = path.join(__dirname, '../../dist');
@@ -224,14 +225,31 @@ app.delete('/api/clearplaylist', async (req, res) => {
 //which breaks the page.  I've tried different callback urls, I've double checked the callback url on the developer dashboard, I've modified and tried different routes to get to callback (exact path vs path, etc.)
 
 app.get('/login', (req, res) => {
-  const scopes = 'user-read-private user-read-email';
+  console.log(chalk.magenta('HELLO I AM AT LOGIN'));
+  const scopes = 'user-read-private user-read-email playlist-modify-public playlist-modify-private playlist-read-private';
   res.redirect('https://accounts.spotify.com/authorize' +
     '?response_type=code' +
     '&client_id=' + process.env.SPOTIFY_KEY +
     (scopes ? '&scope=' + encodeURIComponent(scopes) : '') +
-    '&redirect_uri=' + encodeURIComponent('https://localhost:3000/callback'));
-  // res.sendStatus(200)
+    '&redirect_uri=' + encodeURIComponent('https://localhost:3000/api/callback'));
 });
+
+app.post('/api/callback', (req, res) => {
+  console.log(chalk.red('HELLO I AM CALLBACK'));
+  const getHashParams = () => {
+    let hashParams = {};
+    let e, r = /([^&;=]+)=?([^&;]*)/g,
+        q = window.location.hash.substring(1);
+    while ( e = r.exec(q)) {
+       hashParams[e[1]] = decodeURIComponent(e[2]);
+    }
+    return hashParams;
+  }
+  const info = getHashParams()
+
+  console.log(info);
+
+})
 
 // app.get('*', (req, res) => {
 //   res.sendFile(path.join(PUBLIC_PATH, '/index.html'));

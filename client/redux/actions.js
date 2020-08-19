@@ -124,3 +124,9 @@ export const login = () => (dispatch) => {
       console.log(res);
     })
 }
+
+export const toggleCamelot = () => (dispatch) => {
+  dispatch({
+    type: TYPES.TOGGLE_CAMELOT,
+  })
+}

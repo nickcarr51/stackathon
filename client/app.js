@@ -1,35 +1,36 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter, HashRouter, Route, Switch, Redirect } from 'react-router-dom';
-import { CssBaseline, Button, Grid } from '@material-ui/core';
+import { CssBaseline, Button, Grid, AppBar, Typography, FormControlLabel } from '@material-ui/core';
 import { connect } from 'react-redux';
 import { Search, Dig } from './components/index';
-import Callback from './callback';
+// import Callback from './callback';
 import { login } from './redux/actions';
+import NavBar from './components/navbar/navbar';
 
 const App = ({ login }) => {
+  const [keyType, setKeyType] = React.useState(false)
 
-  const handleCode = () => {
-
-  }
-
-  const handleCallback = ({ location }) => {
-    return <Callback location={location} handleCode={handleCode} />
+  const handleKeyType = () => {
+    setKeyType(!keyType)
   }
 
   return (
     <div>
       <CssBaseline>
-        <HashRouter>
-          <Switch>
-            <Route exact path='/' render={(props) => <Search props={props} /> } />
-            <Route path='/dig/:id?' render={(props) => <Dig props={props} /> } />
-            <Route exact path='/callback' render={(props) => <Callback props={props} /> } />
-            <Redirect to='/' />
-          </Switch>
-        </HashRouter>
-        {/* <Grid container justify='center'>
-          <Button><a href='/login'>Create Playlist</a></Button>
-        </Grid> */}
+        <NavBar />
+        <Grid style={{ margin:'40px 0px'}}>
+          <HashRouter>
+            <Switch>
+              <Route exact path='/' render={(props) => <Search props={props} /> } />
+              <Route path='/dig/:id?' render={(props) => <Dig props={props} /> } />
+              {/* <Route exact path='/callback' render={(props) => <Callback props={props} /> } /> */}
+              <Redirect to='/' />
+            </Switch>
+          </HashRouter>
+          <Grid container justify='center'>
+            <Button><a href='/login'>Create Playlist</a></Button>
+          </Grid>
+        </Grid>
       </CssBaseline>
     </div>
   )

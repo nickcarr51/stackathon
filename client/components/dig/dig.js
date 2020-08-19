@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }))
 
-const Dig = ({ props, getTrack, getInfo, getSimilar, getPlaylist, mainTrack, mainTrackInfo, mainKey, harmonicKeys, allSimilar, allSimilarInfo, currPlaylist }) => {
+const Dig = ({ props, getTrack, getInfo, camelot, getSimilar, getPlaylist, mainTrack, mainTrackInfo, mainKey, harmonicKeys, allSimilar, allSimilarInfo, currPlaylist }) => {
   const [selectedTab, setSelectedTab] = useState(0);
 
   useEffect(() => {
@@ -88,8 +88,10 @@ const Dig = ({ props, getTrack, getInfo, getSimilar, getPlaylist, mainTrack, mai
             </div>
           </Grid>
           <Grid container item direction='column' justify='space-between' xs={2}>
-            <Typography variant='h6'>{ mainKey.name }/{mainKey.camelotPosition}{mainKey.mode === 0 ? 'A' : 'B'}</Typography>
+            <Typography variant='h6'>{camelot ? `${mainKey.camelotPosition}${mainKey.mode === 0 ? 'A' : 'B'}`: mainKey.name}</Typography>
             <Typography variant='h6'>{ Math.floor(mainTrackInfo.tempo)}{' '}BPM</Typography>
+            <Typography variant='h6'>Energy:{' '}{ Math.floor(mainTrackInfo.energy * 100)}</Typography>
+            <Typography variant='h6'>Danceability:{' '}{ Math.floor(mainTrackInfo.danceability * 100)}</Typography>
           </Grid>
         </Grid>
           <Tabs
@@ -101,7 +103,7 @@ const Dig = ({ props, getTrack, getInfo, getSimilar, getPlaylist, mainTrack, mai
             {
               harmonicKeys.map((key, idx) => {
                 return (
-                  <Tab className={classes.tab} key={key.name} label={key.name} />
+                  <Tab className={classes.tab} key={key.name} label={camelot ? `${key.camelotPosition}${key.mode === 0 ? 'A' : 'B'}`: key.name} />
                 )
               })
             }
@@ -250,7 +252,8 @@ const mapStateToProps = state => {
     harmonicKeys: state.harmonicKeys,
     allSimilar: state.allSimilar,
     allSimilarInfo: state.allSimilarInfo,
-    currPlaylist: state.currPlaylist
+    currPlaylist: state.currPlaylist,
+    camelot: state.camelot
   }
 }
 

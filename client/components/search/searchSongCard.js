@@ -20,17 +20,28 @@ const useStyles = makeStyles(theme => ({
   },
   button: {
     marginRight: '20px',
+    width: '100%',
+    maxHeight: '36px'
   },
   artistName: {
     marginLeft: '20px'
   },
   songGrid: {
     margin: '10px 0px'
+  },
+  tempoKey: {
+    margin: '0px 10px'
   }
 }));
 
-const SearchSongCard = ({ track, trackInfo, addToPlaylist }) => {
+const SearchSongCard = ({ track, trackInfo, addToPlaylist, camelot }) => {
   const [currKey, setCurrKey] = useState({})
+
+  // const [cardCamelot, setCardCamelot] = useState(camelot);
+
+  // useEffect(() => {
+  //   setCardCamelot(camelot);
+  // },[!camelot])
   
   useEffect(() => {
     setCurrKey(getKey({pitchClass: trackInfo.key, mode: trackInfo.mode }))
@@ -51,7 +62,8 @@ const SearchSongCard = ({ track, trackInfo, addToPlaylist }) => {
       >
         <Grid
           item
-          xs={10}
+          sm={7}
+          xs={12}
         >
           <Typography
             variant='h6'
@@ -67,24 +79,62 @@ const SearchSongCard = ({ track, trackInfo, addToPlaylist }) => {
         <Grid
           container
           item
-          direction='column'
-          justify='space-between'
+          // direction='column'
+          justify='space-evenly'
           style={{margin: '10px 0px'}}
-          xs={2}
+          xs={12}
+          sm={5}
         >
-            <Typography
-              variant='h6'
-              className={classes.tempoKey}
-            >{currKey.name}</Typography>
-            <Typography
-              variant='h6'
-              className={classes.tempoKey}
-            >{Math.floor(trackInfo.tempo)}{' '}BPM</Typography>
-          <Button onClick={handleAdd} variant="contained" className={classes.button}>Add</Button>
+          <Grid
+            item
+            container
+            // justify='space-between'
+            direction='row'
+            xs={6}
+            sm={6}
+          >
+            <Grid container direction='column'>
+              <Typography
+                variant='subtitle1'
+                className={classes.tempoKey}
+              >{camelot ? `${currKey.camelotPosition}${currKey.mode === 0 ? 'A' : 'B'}`: currKey.name}</Typography>
+              <Typography
+                variant='subtitle1'
+                className={classes.tempoKey}
+              >{Math.floor(trackInfo.tempo)}{' '}BPM</Typography>
+            </Grid>
+          </Grid>
+          <Grid
+            item
+            container
+            // justify='space-between'
+            direction='row'
+            xs={6}
+            sm={6}
+          >
+            <Grid container direction='column'>
+              <Typography
+                variant='subtitle1'
+                className={classes.tempoKey}
+              >Energy{' '}{Math.floor(trackInfo.energy * 100)}</Typography>
+              <Typography
+                variant='subtitle1'
+                className={classes.tempoKey}
+              >Danceability{' '}{Math.floor(trackInfo.danceability * 100)}</Typography>
+            </Grid>
+            <Button onClick={handleAdd} variant="contained" className={classes.button}>Add</Button>
+          </Grid>
         </Grid>
       </Grid>
     // </div>
   )
 }
 
+// const mapStateToProps = state => {
+//   return {
+//     camelot: state.camelot,
+//   }
+// }
+
+// export default connect(mapStateToProps, { addToPlaylist })(SearchSongCard);
 export default connect(null, { addToPlaylist })(SearchSongCard);
