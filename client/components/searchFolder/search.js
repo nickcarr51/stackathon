@@ -39,8 +39,16 @@ const Search = ({ initSearch, initSearchResults, initSearchInfo, currPlaylist, c
   const [input, setInput] = useState('');
 
   useEffect(() => {
+    window.scroll(0, 0);
+  },[])
+
+  useEffect(() => {
     getPlaylist()
   },[currPlaylist.length])
+
+  useEffect(() => {
+    clearSearch();
+  },[]);
 
   const handleInput = (e) => {
     setInput(e.target.value)

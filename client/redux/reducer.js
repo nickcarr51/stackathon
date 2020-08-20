@@ -31,6 +31,7 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         initSearchResults: [],
+        initSearchInfo: [],
       }
     case TYPES.GET_MAIN_TRACK:
       return {

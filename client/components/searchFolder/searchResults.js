@@ -25,7 +25,7 @@ const useStyles = makeStyles(theme => ({
     marginRight: '20px',
   },
   gridItem: {
-    height: '150px'
+    // height: '150px'
   }
 }));
 

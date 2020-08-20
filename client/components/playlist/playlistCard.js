@@ -40,7 +40,7 @@ const PlaylistCard = ({ track, deleteFromPlaylist }) => {
           <Typography>{track.tempo}{' '}BPM</Typography>
         </Grid>
         <Grid container item xs={6}>
-          <CloseIcon className={classes.deleteButton} onClick={handleDelete} />
+          <CloseIcon className='icon' onClick={handleDelete} />
         </Grid>
       </Grid>
     </Grid>

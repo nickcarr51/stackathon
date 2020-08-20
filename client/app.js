@@ -1,19 +1,14 @@
 import React, { useState } from 'react';
 import { BrowserRouter, HashRouter, Route, Switch, Redirect } from 'react-router-dom';
 import { CssBaseline, Button, Grid, AppBar, Typography, FormControlLabel } from '@material-ui/core';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { connect } from 'react-redux';
 import { Search, Dig } from './components/index';
-// import Callback from './callback';
 import { login } from './redux/actions';
 import NavBar from './components/navbar/navbar';
 
-const App = ({ login }) => {
-  const [keyType, setKeyType] = React.useState(false)
-
-  const handleKeyType = () => {
-    setKeyType(!keyType)
-  }
-
+const App = () => {
   return (
     <div>
       <CssBaseline>
@@ -32,6 +27,7 @@ const App = ({ login }) => {
           </Grid>
         </Grid>
       </CssBaseline>
+      <ToastContainer autoClose={1500} />
     </div>
   )
 }

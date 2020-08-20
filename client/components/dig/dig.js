@@ -35,6 +35,10 @@ const Dig = ({ props, getTrack, getInfo, camelot, getSimilar, getPlaylist, mainT
   const [selectedTab, setSelectedTab] = useState(0);
 
   useEffect(() => {
+    window.scroll(0, 0);
+  },[])
+
+  useEffect(() => {
     getTrack(props.match.params.id)
   },[props.match.params.id]);
 
@@ -77,7 +81,7 @@ const Dig = ({ props, getTrack, getInfo, camelot, getSimilar, getPlaylist, mainT
         lg={5}
         md={8}
         sm={12}
-        style={{ width: '80%' }}
+        style={{ width: '100%' }}
       >
         <Paper className={classes.paper}>
         <Grid className={classes.mainTrackContainer} container spacing={3}>

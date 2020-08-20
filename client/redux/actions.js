@@ -1,10 +1,14 @@
 import TYPES from './types';
 import { getKey, getHarmonicKeys } from 'camelot-wheel';
+import { toast } from 'react-toastify';
 
 
 const axios = require('axios');
 
 export const initSearch = (input) => (dispatch) => {
+  dispatch({
+    type: TYPES.CLEAR_SEARCH,
+  })
   axios.post('/api/initsearch', { input })
     .then(res => {
       dispatch({
@@ -86,6 +90,7 @@ export const addToPlaylist = (track, trackInfo, currKey) => (dispatch) => {
         type: TYPES.ADD_TO_PLAYLIST,
         track: res.data,
       })
+      toast.success(`"${track.name}" added to playlist!`)
     })
 }
 
