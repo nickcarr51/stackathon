@@ -10,6 +10,9 @@ const moment = require('moment');
 const qs = require('qs')
 const { db, Session, Song } = require('../db/db');
 
+var env = process.env.NODE_ENV
+
+const CALLBACK_URL = env === 'production' ? 'https://diginkey.herokuapp.com/api/callback' : 'http://localhost:3000/api/callback'
 
 const PORT = process.env.PORT || 3000;
 const PUBLIC_PATH = path.join(__dirname, '../../public');
@@ -233,7 +236,7 @@ app.get('/login', (req, res) => {
     '?response_type=code' +
     '&client_id=' + process.env.SPOTIFY_KEY +
     (scopes ? '&scope=' + encodeURIComponent(scopes) : '') +
-    '&redirect_uri=' + encodeURIComponent('http://localhost:3000/api/callback'));
+    '&redirect_uri=' + encodeURIComponent(CALLBACK_URL));
 });
 
 app.get('/api/callback', (req, res) => {
