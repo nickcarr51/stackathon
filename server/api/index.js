@@ -257,7 +257,7 @@ app.get('/api/callback', (req, res) => {
   const body = {
     grant_type: 'authorization_code',
     code: req.query.code,
-    redirect_uri: 'http://localhost:3000/api/callback'
+    redirect_uri: 'https://diginkey.herokuapp.com/api/callback',
   };
 
     axios.post(
