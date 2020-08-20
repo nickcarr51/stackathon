@@ -4,7 +4,7 @@ import { getInfo, getTrack, getSimilar, getPlaylist } from '../../redux/actions'
 import { makeStyles } from '@material-ui/core/styles';
 import { Box, Paper, Grid, Tabs, Tab, Button, Typography, Accordion, AccordionSummary, AccordionDetails } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import SearchResults from '../search/searchResults';
+import SearchResults from '../searchFolder/searchResults';
 import Playlist from '../playlist/playlist';
 import SpotifyPlayer from 'react-spotify-player';
 import SongEnergy from '../songEnergyChart/songEnergy';
