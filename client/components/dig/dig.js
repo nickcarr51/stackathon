@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import { getInfo, getTrack, getSimilar, getPlaylist } from '../../redux/actions';
 import { makeStyles } from '@material-ui/core/styles';
-import { Box, Paper, Grid, Tabs, Tab, Button, Typography } from '@material-ui/core';
+import { Box, Paper, Grid, Tabs, Tab, Button, Typography, Accordion, AccordionSummary, AccordionDetails } from '@material-ui/core';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import SearchResults from '../search/searchResults';
 import Playlist from '../playlist/playlist';
 import SpotifyPlayer from 'react-spotify-player';
@@ -208,35 +209,45 @@ const Dig = ({ props, getTrack, getInfo, camelot, getSimilar, getPlaylist, mainT
       </Paper>
       </Grid>
       }
-      {
+{
         currPlaylist.length
         ? <Grid container direction='column' alignItems='center' justify='center'>
-            <Grid         
-              item
-              lg={5}
-              md={8}
-              sm={12}
-              style={{ width: '80%' }}
-              >
-              <SongEnergy currPlaylist={currPlaylist} />
-            </Grid>
-            <Grid         
-              item
-              lg={5}
-              md={8}
-              sm={12}
-              style={{ width: '80%' }}
-              >
-              <SongDanceability currPlaylist={currPlaylist} />
-            </Grid>
             <Grid     
               item
               lg={5}
               md={8}
               sm={12}
-              style={{ width: '80%', marginBottom: '20px'}}
+              style={{ width: '100%', margin: '10px 0px'}}
               >
-              <Playlist />
+              <Accordion>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                  <Typography>Playlist</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Playlist />
+                </AccordionDetails>
+              </Accordion>
+            </Grid>
+            <Grid         
+              item
+              lg={5}
+              md={8}
+              sm={12}
+              style={{ width: '100%', margin: '10px 0px' }}
+              >
+              <Accordion>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                  <Typography>Insights</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Grid container direction='column'>
+                    <Typography>Energy</Typography>
+                    <SongEnergy currPlaylist={currPlaylist} />
+                    <Typography>Danceability</Typography>
+                    <SongDanceability currPlaylist={currPlaylist} />
+                  </Grid>
+                </AccordionDetails>
+              </Accordion>
             </Grid>
           </Grid>
         : null

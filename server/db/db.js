@@ -33,38 +33,47 @@ const Song = db.define('song', {
     type: ARRAY(STRING),
   },
   energy: {
-    type: FLOAT
+    type: FLOAT,
+    allowNull: false,
   },
   danceability: {
-    type: FLOAT
+    type: FLOAT,
+    allowNull: false,
   },
   key: {
-    type: STRING
+    type: STRING,
+    allowNull: false,
   },
   camelotKey: {
-    type: STRING
+    type: STRING,
+    allowNull: false,
   },
   tempo: {
-    type: INTEGER
+    type: INTEGER,
+    allowNull: false,
+  },
+  uri: {
+    type: STRING,
+    allowNull: false,
   }
 })
 
 Song.belongsTo(Session);
 Session.hasMany(Song);
 
-const sync = async (force = false) => {
-  try {
-    await db.sync({ force });
-    console.log(chalk.green(`DB successfully connected, and synced. Force: ${force}`));
-  } catch (e) {
-    console.log(chalk.red('Error while connecting to database'));
-    throw e;
-  }
-};
+// const sync = async (force = false) => {
+//   try {
+//     await db.sync({ force });
+//     console.log(chalk.green(`DB successfully connected, and synced. Force: ${force}`));
+//   } catch (e) {
+//     console.log(chalk.red('Error while connecting to database'));
+//     throw e;
+//   }
+// };
 
-const seed = async () => {
-  await sync(true);
-};
+// const seed = async () => {
+//   await sync(true);
+// };
 
 // seed()
 

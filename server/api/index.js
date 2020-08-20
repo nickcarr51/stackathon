@@ -6,6 +6,7 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const app = require('./server');
 const axios = require('axios').default;
+const moment = require('moment');
 const qs = require('qs')
 const { db, Session, Song } = require('../db/db');
 
@@ -199,6 +200,7 @@ app.post('/api/addtoplaylist', async (req, res) => {
     key: currKey.name,
     camelotKey: camelotKey,
     tempo: Math.floor(trackInfo.tempo),
+    uri: track.uri,
     sessionId: req.session_id
   })
 
@@ -231,23 +233,78 @@ app.get('/login', (req, res) => {
     '?response_type=code' +
     '&client_id=' + process.env.SPOTIFY_KEY +
     (scopes ? '&scope=' + encodeURIComponent(scopes) : '') +
-    '&redirect_uri=' + encodeURIComponent('https://localhost:3000/api/callback'));
+    '&redirect_uri=' + encodeURIComponent('http://localhost:3000/api/callback'));
 });
 
-app.post('/api/callback', (req, res) => {
+app.get('/api/callback', (req, res) => {
   console.log(chalk.red('HELLO I AM CALLBACK'));
-  const getHashParams = () => {
-    let hashParams = {};
-    let e, r = /([^&;=]+)=?([^&;]*)/g,
-        q = window.location.hash.substring(1);
-    while ( e = r.exec(q)) {
-       hashParams[e[1]] = decodeURIComponent(e[2]);
-    }
-    return hashParams;
-  }
-  const info = getHashParams()
+  // console.log(req.query.code)
 
-  console.log(info);
+  const headers = {
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    auth: {
+      username: process.env.SPOTIFY_KEY,
+      password: process.env.SPOTIFY_SECRET,
+    },
+  };
+  const body = {
+    grant_type: 'authorization_code',
+    code: req.query.code,
+    redirect_uri: 'http://localhost:3000/api/callback'
+  };
+
+    axios.post(
+      'https://accounts.spotify.com/api/token',
+      qs.stringify(body),
+      headers
+    ).then(response => {
+      const accessToken = response.data.access_token;
+      axios.get(
+        'https://api.spotify.com/v1/me',
+        {
+          headers: {
+            "Authorization": "Bearer " + accessToken
+          }
+        }
+      ).then(response => {
+        const userId = response.data.id;
+        axios.post(
+          `https://api.spotify.com/v1/users/${userId}/playlists`,
+          {
+            name: `digInKey Playlist ${moment().format('MM/DD/YYYY')}`,
+            description: 'A harmonically compatbile playlist made with digInKey'
+            
+          }, {
+            headers: {
+              "Authorization": "Bearer " + accessToken
+            }
+          }
+        ).then(async response => {
+          const playlistId = response.data.id;
+          let songs = await Song.findAll({where: { sessionId: req.session_id }, raw: true})
+          songs = songs.map(song => song.uri)
+          console.log(songs);
+          axios.post(
+            `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
+            {
+              "uris": songs,
+            }, {
+              headers: {
+                "Authorization": "Bearer " + accessToken
+              }
+            }
+          ).then(response => {
+            console.log(response);
+          })
+
+        })
+
+      })
+    })
+  res.redirect('/');
 
 })
 
