@@ -31,10 +31,4 @@ const SongDanceability = ({ currPlaylist }) => {
   )
 }
 
-// const mapStateToProps = state => {
-//   return {
-//     currPlaylist: state.currPlaylist
-//   }
-// }
-
 export default SongDanceability

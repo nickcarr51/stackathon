@@ -2,7 +2,6 @@ import TYPES from './types';
 import { getKey, getHarmonicKeys } from 'camelot-wheel';
 import { toast } from 'react-toastify';
 
-
 const axios = require('axios');
 
 export const initSearch = (input) => (dispatch) => {
@@ -25,6 +24,7 @@ export const initSearch = (input) => (dispatch) => {
       })
     })
 }
+
 export const getTrack = (id) => (dispatch) => {
   axios.post('/api/gettrack', { id })
     .then(res => {
@@ -34,6 +34,7 @@ export const getTrack = (id) => (dispatch) => {
       })
     })
 }
+
 export const getInfo = (id, harmonicKeys) => (dispatch) => {
   axios.post('/api/getinfo', { id, harmonicKeys })
     .then(res => {
@@ -52,11 +53,6 @@ export const getInfo = (id, harmonicKeys) => (dispatch) => {
     })
 }
 
-// export const getInfoUtil = async (id) => {
-//   const info = await axios.post('/api/checkkey', { id }).then(res => res.data)
-//   return info;
-// }
-
 export const getSimilar = (id) => (dispatch) => {
   axios.post('/api/getsimilar', { id })
     .then(res => {
@@ -64,9 +60,7 @@ export const getSimilar = (id) => (dispatch) => {
         type: TYPES.GET_ALL_SIMILAR,
         similar: res.data
       })
-      console.log('LOOKING FOR THIS', res.data);
       const ids = res.data.map(track => track.id).join(',');
-      console.log(ids);
       axios.post('/api/getsimilarinfo', { ids })
         .then(res => {
           dispatch({
@@ -104,13 +98,14 @@ export const getPlaylist = () => (dispatch) => {
     })
 }
 
-export const deleteFromPlaylist = (id) => (dispatch) => {
+export const deleteFromPlaylist = (id, name) => (dispatch) => {
   axios.delete(`/api/deletefromplaylist/${id}`)
     .then(res => {
       dispatch({
         type: TYPES.DELETE_FROM_PLAYLIST,
         deletedTrack: res.data
       })
+      toast.error(`"${name}" removed from playlist! `)
     })
 }
 
@@ -120,6 +115,7 @@ export const clearPlaylist = () => (dispatch) => {
       dispatch({
         type: TYPES.CLEAR_PLAYLIST,
       })
+      toast.error('Playlist cleared!');
     })
 }
 
@@ -134,4 +130,15 @@ export const toggleCamelot = () => (dispatch) => {
   dispatch({
     type: TYPES.TOGGLE_CAMELOT,
   })
+}
+
+export const goBack = (history) => (dispatch) => {
+  dispatch({
+    type: TYPES.GO_BACK,
+  })
+  history.push('/');
+}
+
+export const sendHome = () => (dispatch) => {
+  axios.post('/api/sendhome');
 }

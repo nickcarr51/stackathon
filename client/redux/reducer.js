@@ -76,7 +76,7 @@ const reducer = (state = initialState, action) => {
     case TYPES.DELETE_FROM_PLAYLIST:
       return {
         ...state,
-        currPlaylist: state.currPlaylist.filter(track => track.id !== action.deletedTrack)
+        currPlaylist: state.currPlaylist.filter(track => track.songId !== action.deletedTrack)
       }
     case TYPES.CLEAR_PLAYLIST:
       return {
@@ -87,6 +87,16 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         camelot: !state.camelot
+      }
+    case TYPES.GO_BACK:
+      return {
+        ...state,
+        mainTrack: {},
+        mainTrackInfo: {},
+        mainKey: {},
+        harmonicKeys: [],
+        allSimilar: [],
+        allSimilarInfo: [],
       }
     default:
       return state;

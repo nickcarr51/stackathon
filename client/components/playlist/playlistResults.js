@@ -1,16 +1,9 @@
 import React from 'react';
-import { Paper, Button, Grid } from '@material-ui/core';
+import { Paper, Grid } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import PlaylistCard from './playlistCard';
 
 const useStyles = makeStyles(theme => ({
-  paper: {
-    // height: '100px',
-    // margin: '15px',
-    // display: 'flex',
-    // alignItems: 'center',
-    // justifyContent: 'space-apart'
-  },
   link: {
     marginLeft: '20px',
   },

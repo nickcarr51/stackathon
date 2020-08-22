@@ -1,3 +1,94 @@
 .icon:hover {
   cursor: pointer;
 }
+
+.homeButton {
+  text-decoration: none;
+  color: #ffffff;
+}
+
+.homeButton:visited {
+  color: #ffffff;
+}
+
+.spotifyButton {
+  background-color: #1DB954;
+  color: #ffffff;
+  text-decoration: none;
+  margin-bottom: 5px;
+  border-radius: 20px;
+}
+
+.spotifyButton:visited {
+  color: #ffffff;
+}
+
+.spotifyIcon {
+  margin: 3px;
+  height: 21px;
+  width: 21px;
+}
+
+.E {
+  color: '#7efffa';
+}
+
+.Dbm {
+  color: '#aefefd';
+}
+
+.B {
+  color: '#92fdd4';
+}
+
+.Abm {
+  color: '#b7fee2';
+}
+
+.Gb {
+  color: '#9aff94';
+}
+
+.Ebm {
+  color: '#c5feb8';
+}
+
+.Db {
+  color: '#b4f774';
+}
+
+.Bbm {
+  color: '#d1f6a5';
+}
+
+.Abm {
+  color: '#d0d571';
+}
+
+.Fm {
+  color: '#e3e3a7';
+}
+
+.Eb {
+  color: '#f79c78';
+}
+
+.Cm {
+  color: '#f7c3ab';
+}
+
+.Bb {
+  color: '#fd8587';
+}
+
+.Gm {
+  color: '#ffaeba';
+}
+
+.F {
+  color: '#ee7fb4';
+}
+
+.Dm {
+  color: '#f5aece';
+}

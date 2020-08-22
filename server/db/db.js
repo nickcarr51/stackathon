@@ -20,61 +20,58 @@ const Song = db.define('song', {
   name: {
     type: STRING,
     allowNull: false,
+    unique: false,
     validate: {
       notEmpty: true,
     }
   },
   id: {
-    type: STRING,
+    type: UUID,
+    defaultValue: UUIDV4,
     primaryKey: true,
+  },
+  songId: {
+    type: STRING,
+    unique: false,
     allowNull: false,
   },
   artists: {
     type: ARRAY(STRING),
+    unique: false,
   },
   energy: {
     type: FLOAT,
     allowNull: false,
+    unique: false,
   },
   danceability: {
     type: FLOAT,
     allowNull: false,
+    unique: false,
   },
   key: {
     type: STRING,
     allowNull: false,
+    unique: false,
   },
   camelotKey: {
     type: STRING,
     allowNull: false,
+    unique: false,
   },
   tempo: {
     type: INTEGER,
     allowNull: false,
+    unique: false,
   },
   uri: {
     type: STRING,
     allowNull: false,
+    unique: false,
   }
 })
 
-Song.belongsTo(Session);
-Session.hasMany(Song);
-
-// const sync = async (force = false) => {
-//   try {
-//     await db.sync({ force });
-//     console.log(chalk.green(`DB successfully connected, and synced. Force: ${force}`));
-//   } catch (e) {
-//     console.log(chalk.red('Error while connecting to database'));
-//     throw e;
-//   }
-// };
-
-// const seed = async () => {
-//   await sync(true);
-// };
-
-// seed()
+Song.belongsTo(Session, { unique: false });
+Session.hasMany(Song, { unique: false });
 
 module.exports = { db, Session, Song };

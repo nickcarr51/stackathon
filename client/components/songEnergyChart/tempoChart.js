@@ -4,12 +4,12 @@ import { truncateSong } from '../../utils';
 const CanvasJS = CanvasJSReact.CanvasJS;
 const CanvasJSChart = CanvasJSReact.CanvasJSChart;
 
-const SongEnergy = ({ currPlaylist }) => {
+const SongTempo = ({ currPlaylist }) => {
 
   const options = {
     animationEnabled: true,
     axisY: {
-      text: 'Energy Level'
+      text: 'Tempo'
     },
     data: [{
       type: 'splineArea',
@@ -18,8 +18,8 @@ const SongEnergy = ({ currPlaylist }) => {
         const name = truncateSong(song.name);
         return {
           x: idx,
-          y: (song.energy * 100),
-          label: name,
+          y: (song.tempo),
+          label: name
         }
       })
     }]
@@ -31,4 +31,4 @@ const SongEnergy = ({ currPlaylist }) => {
   )
 }
 
-export default SongEnergy
+export default SongTempo;

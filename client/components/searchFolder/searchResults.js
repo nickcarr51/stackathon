@@ -1,37 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
-import { Paper, Button, Grid } from '@material-ui/core';
+import { Paper, Grid } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { Link } from 'react-router-dom';
 import SearchSongCard from './searchSongCard';
 
 const useStyles = makeStyles(theme => ({
-  paper: {
-    // height: '100px',
-    // margin: '15px',
-    // display: 'flex',
-    // alignItems: 'center',
-    // justifyContent: 'space-apart'
-  },
-  link: {
-    marginLeft: '20px',
-  },
   card: {
     display: 'flex',
     width: '100%',
     justifyContent: 'space-between'
   },
-  button: {
-    marginRight: '20px',
-  },
-  gridItem: {
-    // height: '150px'
-  }
 }));
 
 const SearchResults = ({ results, resultsInfo, camelot }) => {
+  useEffect(() => {
+    window.scroll(0, 0);
+  },[])
   const classes = useStyles();
-  // console.log('RESULTSIINFO', resultsInfo);
   return (
     <div
       style={{
@@ -52,18 +37,11 @@ const SearchResults = ({ results, resultsInfo, camelot }) => {
               results.map(track => {
                 const trackInfo = resultsInfo.find(info => info.id === track.id)
                 return (
-                  // <div 
-                  //   key={track.id}
-                  //   style={{
-                  //     height: '50px'
-                  //   }}
-                  // >
-                  <Grid key={track.id} item xs={12} className={classes.gridItem}>
-                    <Paper className={classes.paper} elevation={3}>
+                  <Grid key={track.id} item xs={12}>
+                    <Paper elevation={3}>
                       <SearchSongCard track={track} trackInfo={trackInfo} camelot={camelot} />
                     </Paper>
                   </Grid>
-                  // </div>
                 )
               })
             }

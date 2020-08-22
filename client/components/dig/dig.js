@@ -1,24 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
-import { getInfo, getTrack, getSimilar, getPlaylist } from '../../redux/actions';
+import { getInfo, getTrack, getSimilar, getPlaylist, addToPlaylist, goBack } from '../../redux/actions';
 import { makeStyles } from '@material-ui/core/styles';
-import { Box, Paper, Grid, Tabs, Tab, Button, Typography, Accordion, AccordionSummary, AccordionDetails } from '@material-ui/core';
+import { Paper, Grid, Tabs, Tab, Button, Typography, Accordion, AccordionSummary, AccordionDetails, CircularProgress } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import PlaylistAddIcon from '@material-ui/icons/PlaylistAdd';
+import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace';
+import Spotify_Icon_CMYK_White from '../../../public/assets/images/Spotify_Icon_CMYK_White.png';
+import ShuffleIcon from '@material-ui/icons/Shuffle';
+import { truncateSixty } from '../../utils';
+import { getKey } from 'camelot-wheel';
 import SearchResults from '../searchFolder/searchResults';
 import Playlist from '../playlist/playlist';
 import SpotifyPlayer from 'react-spotify-player';
 import SongEnergy from '../songEnergyChart/songEnergy';
 import SongDanceability from '../songEnergyChart/danceabilityChart';
+import SongTempo from '../songEnergyChart/tempoChart';
 
 const useStyles = makeStyles((theme) => ({
-  paper: {
-    // marginTop: theme.spacing(3),
-    // marginBotom: theme.spacing(3),
-    // padding: theme.spacing(4),
-    // display: 'flex',
-    // flexDirection: 'column',
-    // height: '600px'
-  },
   box: {
     margin: '0 auto',
     height: '600px'
@@ -28,11 +27,32 @@ const useStyles = makeStyles((theme) => ({
   },
   mainTrackContainer: {
     padding: '10px'
+  },
+  songGrid: {
+    margin: '10px',
+    height: 'auto',
+    alignItems: 'center',
+  },
+  topRow: {
+    margin: '10px'
+  },
+  trackName: {
+    fontSize: '1.3rem',
+  },
+  bottomRow: {
+    marginRight: '20px'
+  },
+  tempoKey: {
+    margin: '0px 10px'
+  },
+  button: {
+    color: '#ffffff'
   }
 }))
 
-const Dig = ({ props, getTrack, getInfo, camelot, getSimilar, getPlaylist, mainTrack, mainTrackInfo, mainKey, harmonicKeys, allSimilar, allSimilarInfo, currPlaylist }) => {
+const Dig = ({ props, getTrack, getInfo, camelot, getSimilar, getPlaylist, mainTrack, mainTrackInfo, mainKey, harmonicKeys, allSimilar, allSimilarInfo, currPlaylist, addToPlaylist, goBack }) => {
   const [selectedTab, setSelectedTab] = useState(0);
+  const [currKey, setCurrKey] = useState({})
 
   useEffect(() => {
     window.scroll(0, 0);
@@ -54,18 +74,29 @@ const Dig = ({ props, getTrack, getInfo, camelot, getSimilar, getPlaylist, mainT
     getPlaylist()
   },[currPlaylist.length])
 
+  useEffect(() => {
+    setCurrKey(getKey({pitchClass: mainTrackInfo.key, mode: mainTrackInfo.mode }))
+  },[])
+
   const handleTabChange = (event, newValue) => {
     setSelectedTab(newValue);
   }
+
+  const handleAdd = (e) => {
+    e.preventDefault();
+    addToPlaylist(mainTrack, mainTrackInfo, mainKey);
+  }
+
+  const shuffle = () => {
+    getSimilar(props.match.params.id, harmonicKeys);
+  }
+
+  const handleGoBack = () => {
+    goBack(props.history);
+  }
   
   const classes = useStyles();
-  console.log(props);
-  console.log('MAIN TRACK', mainTrack);
-  console.log('MAIN TRACK INFO', mainTrackInfo);
-  console.log('MAIN KEY', mainKey);
-  console.log('HARMONIC KEYS', harmonicKeys);
-  console.log('SIMILAR TRACKS', allSimilar)
-  console.log('SIMILAR TRACK INFO', allSimilarInfo)
+
   return (
     <Grid
       container
@@ -73,147 +104,175 @@ const Dig = ({ props, getTrack, getInfo, camelot, getSimilar, getPlaylist, mainT
       direction='column'
       alignItems='center'
       justify='center'
-      style={{ minHeight: '100vh' }}
+      style={{ minHeight: '100vh', marginTop: '40px' }}
     >
-      {mainTrack && mainTrackInfo && mainKey && harmonicKeys.length && allSimilar.length && allSimilarInfo.length && 
-        <Grid
-        item
-        lg={5}
-        md={8}
-        sm={12}
-        style={{ width: '100%' }}
-      >
-        <Paper className={classes.paper}>
-        <Grid className={classes.mainTrackContainer} container spacing={3}>
-          <Grid item xs={10}>
-            <Typography variant='h6'>{mainTrack.artists.map(artist => artist.name).join(', ')}</Typography>
-            <Typography variant='h4'>{mainTrack.name}</Typography>
-            <div>
-              <SpotifyPlayer uri={mainTrack.uri} size='compact' view='coverart' theme='white' />
-            </div>
-          </Grid>
-          <Grid container item direction='column' justify='space-between' xs={2}>
-            <Typography variant='h6'>{camelot ? `${mainKey.camelotPosition}${mainKey.mode === 0 ? 'A' : 'B'}`: mainKey.name}</Typography>
-            <Typography variant='h6'>{ Math.floor(mainTrackInfo.tempo)}{' '}BPM</Typography>
-            <Typography variant='h6'>Energy:{' '}{ Math.floor(mainTrackInfo.energy * 100)}</Typography>
-            <Typography variant='h6'>Danceability:{' '}{ Math.floor(mainTrackInfo.danceability * 100)}</Typography>
-          </Grid>
+      {mainTrack && mainTrackInfo && mainKey && harmonicKeys.length && allSimilar.length && allSimilarInfo.length 
+      ? <Grid item lg={5} md={8} sm={12} style={{ width: '100%' }} >
+          <Paper>
+            <Grid className={classes.songGrid} container justify='space-between'>
+              <Grid className={classes.topRow} item container direction='row' justifycontent='space-apart' xs={12}>
+                <Grid container item direction='column' xs={9}>
+                  <Typography variant='subtitle1'>{mainTrack.artists.map(artist => artist.name).join(', ')}</Typography>
+                    <Typography className={classes.trackName}>{truncateSixty(mainTrack.name)}</Typography>
+                </Grid>
+                <Grid container item direction='row' justify='space-evenly' alignitems='center' xs={3}>
+                  <ShuffleIcon className='icon' onClick={shuffle} />
+                  <PlaylistAddIcon className='icon' onClick={handleAdd} />
+                </Grid>
+              </Grid>
+              <Grid className={classes.bottomRow} container item direction='row' justify='space-between' xs={12}>
+                <Grid container item xs={12} sm={12} md={6} lg={6}>
+                  <div style={{padding: '10px'}}>
+                    <SpotifyPlayer uri={mainTrack.uri} size='compact' view='coverart' theme='white' />
+                  </div>
+                </Grid>
+                <Grid container item direction='row' xs={12} sm={12} md={6} lg={6}>
+                  <Grid container item direction='column' justify='space-evenly' xs={6}>
+                    <Typography className={classes.tempoKey} variant='h6'>{camelot ? `${mainKey.camelotPosition}${mainKey.mode === 0 ? 'A' : 'B'}`: mainKey.name}</Typography>
+                    <Typography className={classes.tempoKey} variant='subtitle1'>Energy:{' '}{ Math.floor(mainTrackInfo.energy * 100)}</Typography>
+                  </Grid>
+                  <Grid container item direction='column' justify='space-evenly' xs={6}>
+                    <Typography className={classes.tempoKey} variant='h6'>{ Math.floor(mainTrackInfo.tempo)}{' '}BPM</Typography>
+                    <Typography className={classes.tempoKey} variant='subtitle1'>Danceability:{' '}{ Math.floor(mainTrackInfo.danceability * 100)}</Typography>
+                  </Grid>
+                </Grid>
+              </Grid>
+            </Grid>
+            <Tabs centered variant='fullWidth' value={selectedTab} onChange={handleTabChange} >
+              {
+                harmonicKeys.map((key, idx) => {
+                  return (
+                    <Tab className={classes.tab} key={key.name} label={camelot ? `${key.camelotPosition}${key.mode === 0 ? 'A' : 'B'}`: key.name} />
+                  )
+                })
+              }
+            </Tabs>
+              {
+                selectedTab === 0 && allSimilarInfo.length && allSimilar.length &&
+                <SearchResults 
+                  results={
+                    allSimilar.filter(track => {
+                      const audioFeatures = allSimilarInfo.find(feat => feat.id === track.id);
+                      const key = harmonicKeys[0];
+                      if (audioFeatures && key) {
+                        if (audioFeatures.key === key.pitchClass && audioFeatures.mode === key.mode) {
+                          return track;
+                        }
+                      }
+                    }).sort((a, b) => {
+                      const aInfo = allSimilarInfo.find(feat => feat.id === a.id)
+                      const bInfo = allSimilarInfo.find(feat => feat.id === b.id);
+                      const aDiff = Math.abs(aInfo.tempo - mainTrackInfo.tempo)
+                      const bDiff = Math.abs(bInfo.tempo - mainTrackInfo.tempo)
+                      return aDiff > bDiff ? 1 : -1;
+                    })
+                  }
+                  resultsInfo={
+                    allSimilarInfo.filter(info => {
+                      const key = harmonicKeys[0];
+                      if (info.key === key.pitchClass && info.mode === key.mode) {
+                        return info;
+                      }
+                    })
+                  }
+                />
+              }
+              {
+                selectedTab === 1 && allSimilarInfo.length && allSimilar.length && 
+                <SearchResults 
+                  results={
+                    allSimilar.filter(track => {
+                      const audioFeatures = allSimilarInfo.find(feat => feat.id === track.id);
+                      const key = harmonicKeys[1];
+                      if (audioFeatures && key) {
+                        if (audioFeatures.key === key.pitchClass && audioFeatures.mode === key.mode) {
+                          return track;
+                        }
+                      }
+                    }).sort((a, b) => {
+                      const aInfo = allSimilarInfo.find(feat => feat.id === a.id)
+                      const bInfo = allSimilarInfo.find(feat => feat.id === b.id);
+                      const aDiff = Math.abs(aInfo.tempo - mainTrackInfo.tempo)
+                      const bDiff = Math.abs(bInfo.tempo - mainTrackInfo.tempo)
+                      return aDiff > bDiff ? 1 : -1;
+                    })
+                  }
+                  resultsInfo={
+                    allSimilarInfo.filter(info => {
+                      const key = harmonicKeys[1];
+                      if (info.key === key.pitchClass && info.mode === key.mode) {
+                        return info;
+                      }
+                    })
+                  }
+                />
+              }
+              {
+                selectedTab === 2 && allSimilarInfo.length && allSimilar.length && 
+                <SearchResults 
+                  results={
+                    allSimilar.filter(track => {
+                      const audioFeatures = allSimilarInfo.find(feat => feat.id === track.id);
+                      const key = harmonicKeys[2];
+                      if (audioFeatures && key) {
+                        if (audioFeatures.key === key.pitchClass && audioFeatures.mode === key.mode) {
+                          return track;
+                        }
+                      }
+                    }).sort((a, b) => {
+                      const aInfo = allSimilarInfo.find(feat => feat.id === a.id)
+                      const bInfo = allSimilarInfo.find(feat => feat.id === b.id);
+                      const aDiff = Math.abs(aInfo.tempo - mainTrackInfo.tempo)
+                      const bDiff = Math.abs(bInfo.tempo - mainTrackInfo.tempo)
+                      return aDiff > bDiff ? 1 : -1;
+                    })
+                  }
+                  resultsInfo={
+                    allSimilarInfo.filter(info => {
+                      const key = harmonicKeys[2];
+                      if (info.key === key.pitchClass && info.mode === key.mode) {
+                        return info;
+                      }
+                    })
+                  }
+                />
+              }
+              {
+                selectedTab === 3 && allSimilarInfo.length && allSimilar.length && 
+                <SearchResults 
+                  results={
+                    allSimilar.filter(track => {
+                      const audioFeatures = allSimilarInfo.find(feat => feat.id === track.id);
+                      const key = harmonicKeys[3];
+                      if (audioFeatures && key) {
+                        if (audioFeatures.key === key.pitchClass && audioFeatures.mode === key.mode) {
+                          return track;
+                        }
+                      }
+                    }).sort((a, b) => {
+                      const aInfo = allSimilarInfo.find(feat => feat.id === a.id)
+                      const bInfo = allSimilarInfo.find(feat => feat.id === b.id);
+                      const aDiff = Math.abs(aInfo.tempo - mainTrackInfo.tempo)
+                      const bDiff = Math.abs(bInfo.tempo - mainTrackInfo.tempo)
+                      return aDiff > bDiff ? 1 : -1;
+                    })
+                  }
+                  resultsInfo={
+                    allSimilarInfo.filter(info => {
+                      const key = harmonicKeys[3];
+                      if (info.key === key.pitchClass && info.mode === key.mode) {
+                        return info;
+                      }
+                    })
+                  }
+                />
+              }
+            <Button onClick={handleGoBack}><KeyboardBackspaceIcon />Back</Button>
+          </Paper>
         </Grid>
-          <Tabs
-            centered
-            variant='fullWidth'
-            value={selectedTab}
-            onChange={handleTabChange}
-          >
-            {
-              harmonicKeys.map((key, idx) => {
-                return (
-                  <Tab className={classes.tab} key={key.name} label={camelot ? `${key.camelotPosition}${key.mode === 0 ? 'A' : 'B'}`: key.name} />
-                )
-              })
-            }
-          </Tabs>
-            {
-              selectedTab === 0 && allSimilarInfo.length && allSimilar.length  && 
-              <SearchResults 
-                results={
-                  allSimilar.filter(track => {
-                    const audioFeatures = allSimilarInfo.find(feat => feat.id === track.id);
-                    const key = harmonicKeys[0];
-                    if (audioFeatures && key) {
-                      if (audioFeatures.key === key.pitchClass && audioFeatures.mode === key.mode) {
-                        return track;
-                      }
-                    }
-                  })
-                }
-                resultsInfo={
-                  allSimilarInfo.filter(info => {
-                    const key = harmonicKeys[0];
-                    if (info.key === key.pitchClass && info.mode === key.mode) {
-                      return info;
-                    }
-                  })
-                }
-              />
-            }
-            {
-              selectedTab === 1 && allSimilarInfo.length && allSimilar.length  && 
-              <SearchResults 
-                results={
-                  allSimilar.filter(track => {
-                    const audioFeatures = allSimilarInfo.find(feat => feat.id === track.id);
-                    const key = harmonicKeys[1];
-                    if (audioFeatures && key) {
-                      if (audioFeatures.key === key.pitchClass && audioFeatures.mode === key.mode) {
-                        return track;
-                      }
-                    }
-                  })
-                }
-                resultsInfo={
-                  allSimilarInfo.filter(info => {
-                    const key = harmonicKeys[1];
-                    if (info.key === key.pitchClass && info.mode === key.mode) {
-                      return info;
-                    }
-                  })
-                }
-              />
-            }
-            {
-              selectedTab === 2 && allSimilarInfo.length && allSimilar.length  && 
-              <SearchResults 
-                results={
-                  allSimilar.filter(track => {
-                    const audioFeatures = allSimilarInfo.find(feat => feat.id === track.id);
-                    const key = harmonicKeys[2];
-                    if (audioFeatures && key) {
-                      if (audioFeatures.key === key.pitchClass && audioFeatures.mode === key.mode) {
-                        return track;
-                      }
-                    }
-                  })
-                }
-                resultsInfo={
-                  allSimilarInfo.filter(info => {
-                    const key = harmonicKeys[2];
-                    if (info.key === key.pitchClass && info.mode === key.mode) {
-                      return info;
-                    }
-                  })
-                }
-              />
-            }
-            {
-              selectedTab === 3 && allSimilarInfo.length && allSimilar.length  && 
-              <SearchResults 
-                results={
-                  allSimilar.filter(track => {
-                    const audioFeatures = allSimilarInfo.find(feat => feat.id === track.id);
-                    const key = harmonicKeys[3];
-                    if (audioFeatures && key) {
-                      if (audioFeatures.key === key.pitchClass && audioFeatures.mode === key.mode) {
-                        return track;
-                      }
-                    }
-                  })
-                }
-                resultsInfo={
-                  allSimilarInfo.filter(info => {
-                    const key = harmonicKeys[3];
-                    if (info.key === key.pitchClass && info.mode === key.mode) {
-                      return info;
-                    }
-                  })
-                }
-              />
-            }
-        <Button onClick={() => props.history.push('/')}>Back</Button>
-      </Paper>
-      </Grid>
+      : <Grid className={classes.box} container justify='center' align='flex-start' item lg={5} md={8} sm={12} style={{ width: '100%' }}><CircularProgress /></Grid>
       }
-{
+      {
         currPlaylist.length
         ? <Grid container direction='column' alignItems='center' justify='center'>
             <Grid     
@@ -232,26 +291,25 @@ const Dig = ({ props, getTrack, getInfo, camelot, getSimilar, getPlaylist, mainT
                 </AccordionDetails>
               </Accordion>
             </Grid>
-            <Grid         
-              item
-              lg={5}
-              md={8}
-              sm={12}
-              style={{ width: '100%', margin: '10px 0px' }}
-              >
+            <Grid item lg={5} md={8} sm={12} style={{ width: '100%', margin: '10px 0px' }} >
               <Accordion>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                   <Typography>Insights</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                   <Grid container direction='column'>
-                    <Typography>Energy</Typography>
+                    <Typography variant='h5'>Tempo</Typography>
+                    <SongTempo currPlaylist={currPlaylist} />
+                    <Typography variant='h5'>Energy</Typography>
                     <SongEnergy currPlaylist={currPlaylist} />
-                    <Typography>Danceability</Typography>
+                    <Typography variant='h5'>Danceability</Typography>
                     <SongDanceability currPlaylist={currPlaylist} />
                   </Grid>
                 </AccordionDetails>
               </Accordion>
+            </Grid>
+            <Grid container justify='center' style={{marginBottom: '20px'}}>
+              <a className='spotifyButton' href='/login'><Button className={classes.button}>Create Playlist<img className='spotifyIcon' src={Spotify_Icon_CMYK_White} /></Button></a>
             </Grid>
           </Grid>
         : null
@@ -272,144 +330,6 @@ const mapStateToProps = state => {
   }
 }
 
-const mapDispatchToProps = { getInfo, getTrack, getSimilar, getPlaylist }
+const mapDispatchToProps = { getInfo, getTrack, getSimilar, getPlaylist, addToPlaylist, goBack }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Dig);
-
-
-// const Dig = ({ props, getTrack, getInfo, getSimilar, mainTrack, mainTrackInfo, mainKey, harmonicKeys, allSimilar, allSimilarInfo }) => {
-//   const [selectedTab, setSelectedTab] = useState(0);
-
-//   useEffect(() => {
-//     getTrack(props.match.params.id)
-//   },[props.match.params.id]);
-
-//   useEffect(() => {
-//     getInfo(props.match.params.id);
-//   },[props.match.params.id]);
-
-//   useEffect(() => {
-//     getSimilar(props.match.params.id, harmonicKeys);
-//   },[props.match.params.id])
-
-//   const handleTabChange = (event, newValue) => {
-//     setSelectedTab(newValue);
-//   }
-  
-//   const classes = useStyles();
-//   console.log(props);
-//   console.log('MAIN TRACK', mainTrack);
-//   console.log('MAIN TRACK INFO', mainTrackInfo);
-//   console.log('MAIN KEY', mainKey);
-//   console.log('HARMONIC KEYS', harmonicKeys);
-//   console.log('SIMILAR TRACKS', allSimilar)
-//   console.log('SIMILAR TRACK INFO', allSimilarInfo)
-//   return (
-//     <Box width='50%' className={classes.box}>
-//       <Paper className={classes.paper}>
-//         <Grid container spacing={3}>
-//           <Grid item xs={12}>
-//             <h1>{mainTrack.name}</h1>
-//           </Grid>
-//           <Grid item xs={6}>
-//             <h2>{ mainKey.name }/{mainKey.camelotPosition}{mainKey.mode === 0 ? 'A' : 'B'}</h2>
-//           </Grid>
-//           <Grid item xs={6}>
-//             <h2>{ Math.floor(mainTrackInfo.tempo)}{' '}BPM</h2>
-//           </Grid>
-//         </Grid>
-//           <Tabs
-//             value={selectedTab}
-//             onChange={handleTabChange}
-//           >
-//             {
-//               harmonicKeys.map((key, idx) => {
-//                 return (
-//                   <Tab className={classes.tab} key={key.name} label={key.name} />
-//                 )
-//               })
-//             }
-//           </Tabs>
-//             {
-//               selectedTab === 0 && allSimilarInfo.length && allSimilar.length  && 
-//               <SearchResults 
-//                 results={
-//                   allSimilar.filter(track => {
-//                     const audioFeatures = allSimilarInfo.find(feat => feat.id === track.id);
-//                     const key = harmonicKeys[0];
-//                     if (audioFeatures && key) {
-//                       if (audioFeatures.key === key.pitchClass && audioFeatures.mode === key.mode) {
-//                         return track;
-//                       }
-//                     }
-//                   })
-//                 }
-//               />
-//             }
-//             {
-//               selectedTab === 1 && allSimilarInfo.length && allSimilar.length  && 
-//               <SearchResults 
-//                 results={
-//                   allSimilar.filter(track => {
-//                     const audioFeatures = allSimilarInfo.find(feat => feat.id === track.id);
-//                     const key = harmonicKeys[1];
-//                     if (audioFeatures && key) {
-//                       if (audioFeatures.key === key.pitchClass && audioFeatures.mode === key.mode) {
-//                         return track;
-//                       }
-//                     }
-//                   })
-//                 }
-//               />
-//             }
-//             {
-//               selectedTab === 2 && allSimilarInfo.length && allSimilar.length  && 
-//               <SearchResults 
-//                 results={
-//                   allSimilar.filter(track => {
-//                     const audioFeatures = allSimilarInfo.find(feat => feat.id === track.id);
-//                     const key = harmonicKeys[2];
-//                     if (audioFeatures && key) {
-//                       if (audioFeatures.key === key.pitchClass && audioFeatures.mode === key.mode) {
-//                         return track;
-//                       }
-//                     }
-//                   })
-//                 }
-//               />
-//             }
-//             {
-//               selectedTab === 3 && allSimilarInfo.length && allSimilar.length  && 
-//               <SearchResults 
-//                 results={
-//                   allSimilar.filter(track => {
-//                     const audioFeatures = allSimilarInfo.find(feat => feat.id === track.id);
-//                     const key = harmonicKeys[3];
-//                     if (audioFeatures && key) {
-//                       if (audioFeatures.key === key.pitchClass && audioFeatures.mode === key.mode) {
-//                         return track;
-//                       }
-//                     }
-//                   })
-//                 }
-//               />
-//             }
-//         <Button onClick={() => props.history.push('/')}>Back</Button>
-//       </Paper>
-//     </Box>
-//   )
-// }
-// const mapStateToProps = state => {
-//   return {
-//     mainTrack: state.mainTrack,
-//     mainTrackInfo: state.mainTrackInfo,
-//     mainKey: state.mainKey,
-//     harmonicKeys: state.harmonicKeys,
-//     allSimilar: state.allSimilar,
-//     allSimilarInfo: state.allSimilarInfo
-//   }
-// }
-
-// const mapDispatchToProps = { getInfo, getTrack, getSimilar }
-
-// export default connect(mapStateToProps, mapDispatchToProps)(Dig);

@@ -5,33 +5,23 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Paper, TextField, Button, Grid, Accordion, AccordionSummary, AccordionDetails, Typography } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import CloseIcon from '@material-ui/icons/Close';
+import Spotify_Icon_CMYK_White from '../../../public/assets/images/Spotify_Icon_CMYK_White.png';
 import SearchResults from './searchResults';
 import Playlist from '../playlist/playlist';
 import SongEnergy from '../songEnergyChart/songEnergy';
 import SongDanceability from '../songEnergyChart/danceabilityChart';
 
 const useStyles = makeStyles((theme) => ({
-  paper: {
-    // marginTop: theme.spacing(3),
-    // marginBotom: theme.spacing(3),
-    // padding: theme.spacing(4),
-    // display: 'flex',
-    // flexDirection: 'column',
-    // justifyContent: 'center',
-    // height: '600px'
-  },
-  box: {
-    margin: '0 auto',
-    height: '600px'
-  },
   textField: {
     width: '80%',
     marginTop: '10px'
-    // margin: '20px 20px'
   },
   form: {
     display: 'flex',
     justifyContent: 'center'
+  },
+  button: {
+    color: '#ffffff'
   }
 }))
 
@@ -65,25 +55,11 @@ const Search = ({ initSearch, initSearchResults, initSearchInfo, currPlaylist, c
   }
 
   const classes = useStyles();
-  console.log('SEARCH RESULTS', initSearchResults)
-  console.log('SEARCH INFO', initSearchInfo)
+
   return (
-    <Grid
-      container
-      spacing={0}
-      direction='column'
-      alignItems='center'
-      justify='center'
-      style={{ minHeight: '100vh '}}
-    >
-      <Grid
-        item
-        lg={5}
-        md={8}
-        sm={12}
-        style={{ width: '100%'}}
-      >
-        <Paper className={classes.paper}>
+    <Grid container spacing={0} direction='column' alignItems='center' justify='center' style={{ minHeight: '100vh '}} >
+      <Grid item lg={5} md={8} sm={12} style={{ width: '100%'}} >
+        <Paper>
           <form className={classes.form} onSubmit={handleSubmit}>
             <TextField className={classes.textField} value={input} onChange={handleInput} fullWidth={true} label='Search Spotify'/>
           </form>
@@ -98,13 +74,7 @@ const Search = ({ initSearch, initSearchResults, initSearchInfo, currPlaylist, c
       {
         currPlaylist.length
         ? <Grid container direction='column' alignItems='center' justify='center'>
-            <Grid     
-              item
-              lg={5}
-              md={8}
-              sm={12}
-              style={{ width: '100%', margin: '10px 0px'}}
-              >
+            <Grid item lg={5} md={8} sm={12} style={{ width: '100%', margin: '10px 0px'}} >
               <Accordion>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                   <Typography>Playlist</Typography>
@@ -114,13 +84,7 @@ const Search = ({ initSearch, initSearchResults, initSearchInfo, currPlaylist, c
                 </AccordionDetails>
               </Accordion>
             </Grid>
-            <Grid         
-              item
-              lg={5}
-              md={8}
-              sm={12}
-              style={{ width: '100%', margin: '10px 0px' }}
-              >
+            <Grid item lg={5} md={8} sm={12} style={{ width: '100%', margin: '10px 0px' }} >
               <Accordion>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                   <Typography>Insights</Typography>
@@ -134,6 +98,9 @@ const Search = ({ initSearch, initSearchResults, initSearchInfo, currPlaylist, c
                   </Grid>
                 </AccordionDetails>
               </Accordion>
+            </Grid>
+            <Grid container justify='center'>
+              <a className='spotifyButton' href='/login'><Button className={classes.button}>Create Playlist<img className='spotifyIcon' src={Spotify_Icon_CMYK_White} /></Button></a>
             </Grid>
           </Grid>
         : null
@@ -153,49 +120,3 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = { initSearch, clearSearch, getPlaylist };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Search);
-
-// const Search = ({ initSearch, initSearchResults, clearSearch}) => {
-//   const [input, setInput] = useState('');
-
-//   const handleInput = (e) => {
-//     setInput(e.target.value)
-//   }
-
-//   const handleSubmit = (e) => {
-//     e.preventDefault();
-//     initSearch(input);
-//   }
-
-//   const handleClearSearch = () => {
-//     clearSearch()
-//     setInput('');
-//   }
-
-//   const classes = useStyles();
-//   console.log('SEARCH RESULTS', initSearchResults)
-//   return (
-//     <Box width='50%' className={classes.box}>
-//       <Paper className={classes.paper}>
-//           <form onSubmit={handleSubmit}>
-//             <TextField value={input} onChange={handleInput} fullWidth={true} label='Search Spotify'/>
-//           </form>
-//         <SearchResults results={initSearchResults} />
-//         {
-//             initSearchResults.length
-//             ? <Button onClick={handleClearSearch}>Clear Results<CloseIcon /></Button>
-//             : null
-//           }
-//       </Paper>
-//     </Box>
-//   )
-// }
-
-// const mapStateToProps = (state) => {
-//   return {
-//     initSearchResults: state.initSearchResults
-//   }
-// }
-
-// const mapDispatchToProps = { initSearch, clearSearch };
-
-// export default connect(mapStateToProps, mapDispatchToProps)(Search);

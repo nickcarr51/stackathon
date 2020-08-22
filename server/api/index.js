@@ -10,11 +10,6 @@ const moment = require('moment');
 const qs = require('qs')
 const { db, Session, Song } = require('../db/db');
 
-// var env = process.env.NODE_ENV
-
-// const CALLBACK_URL = env === 'production' ? 'https://diginkey.herokuapp.com/api/callback' : 'http://localhost:3000/api/callback'
-
-
 const PORT = process.env.PORT || 3000;
 const PUBLIC_PATH = path.join(__dirname, '../../public');
 const DIST_PATH = path.join(__dirname, '../../dist');
@@ -197,7 +192,7 @@ app.post('/api/addtoplaylist', async (req, res) => {
   }
   const song = await Song.create({
     name: track.name,
-    id: track.id,
+    songId: track.id,
     artists: track.artists.map(artist => artist.name),
     energy: trackInfo.energy,
     danceability: trackInfo.danceability,
@@ -218,7 +213,7 @@ app.get('/api/getplaylist', async (req, res) => {
 
 app.delete('/api/deletefromplaylist/:id', async (req, res) => {
   const { id } = req.params;
-  await Song.destroy({ where: { id: id, sessionId: req.session_id }});
+  await Song.destroy({ where: { songId: id, sessionId: req.session_id }});
   res.send(id);
 })
 
@@ -227,23 +222,18 @@ app.delete('/api/clearplaylist', async (req, res) => {
   res.sendStatus(200);
 })
 
-//this is directly from the spotify docs, first time around this does redirect correctly to the spotify login page, then redirects the page to the callback url with the accesstoken in the hash,
-//which breaks the page.  I've tried different callback urls, I've double checked the callback url on the developer dashboard, I've modified and tried different routes to get to callback (exact path vs path, etc.)
 
 app.get('/login', (req, res) => {
-  console.log(chalk.magenta('HELLO I AM AT LOGIN'));
   const scopes = 'user-read-private user-read-email playlist-modify-public playlist-modify-private playlist-read-private';
   res.redirect('https://accounts.spotify.com/authorize' +
     '?response_type=code' +
     '&client_id=' + process.env.SPOTIFY_KEY +
     (scopes ? '&scope=' + encodeURIComponent(scopes) : '') +
-    // '&redirect_uri=' + encodeURIComponent('https://diginkey.herokuapp.com/api/callback'));
-    '&redirect_uri=' + encodeURIComponent('http://localhost:3000/api/callback'));
+    '&redirect_uri=' + encodeURIComponent('https://diginkey.herokuapp.com/api/callback'));
+    // '&redirect_uri=' + encodeURIComponent('http://localhost:3000/api/callback'));
 });
 
 app.get('/api/callback', (req, res) => {
-  console.log(chalk.red('HELLO I AM CALLBACK'));
-  // console.log(req.query.code)
 
   const headers = {
     headers: {
@@ -258,8 +248,8 @@ app.get('/api/callback', (req, res) => {
   const body = {
     grant_type: 'authorization_code',
     code: req.query.code,
-    // redirect_uri: 'https://diginkey.herokuapp.com/api/callback',
-    redirect_uri: 'http://localhost:3000/api/callback',
+    redirect_uri: 'https://diginkey.herokuapp.com/api/callback',
+    // redirect_uri: 'http://localhost:3000/api/callback',
   };
 
     axios.post(
@@ -292,7 +282,6 @@ app.get('/api/callback', (req, res) => {
           const playlistId = response.data.id;
           let songs = await Song.findAll({where: { sessionId: req.session_id }, raw: true})
           songs = songs.map(song => song.uri)
-          console.log(songs);
           axios.post(
             `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
             {
@@ -302,21 +291,23 @@ app.get('/api/callback', (req, res) => {
                 "Authorization": "Bearer " + accessToken
               }
             }
-          ).then(response => {
-            console.log(response);
+          ).then(async response => {
+            await Song.destroy({ where: { sessionId: req.session_id }});
+            
           })
 
         })
 
       })
     })
-  res.redirect('/');
+    res.redirect('/#/playlistcreated');
 
 })
 
-// app.get('*', (req, res) => {
-//   res.sendFile(path.join(PUBLIC_PATH, '/index.html'));
-// });
+app.post('/api/sendhome', (req, res) => {
+  res.redirect('/');
+})
+
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../../public/index.html'));
 });

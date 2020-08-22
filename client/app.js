@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import { BrowserRouter, HashRouter, Route, Switch, Redirect } from 'react-router-dom';
-import { CssBaseline, Button, Grid, AppBar, Typography, FormControlLabel } from '@material-ui/core';
+import React from 'react';
+import { HashRouter, Route, Switch, Redirect } from 'react-router-dom';
+import { CssBaseline, Grid } from '@material-ui/core';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { connect } from 'react-redux';
-import { Search, Dig } from './components/index';
+import { Search, Dig, PlaylistCreated } from './components/index';
 import { login } from './redux/actions';
 import NavBar from './components/navbar/navbar';
 
@@ -13,18 +13,15 @@ const App = () => {
     <div>
       <CssBaseline>
         <NavBar />
-        <Grid style={{ margin:'40px 0px'}}>
+        <Grid>
           <HashRouter>
             <Switch>
               <Route exact path='/' render={(props) => <Search props={props} /> } />
               <Route path='/dig/:id?' render={(props) => <Dig props={props} /> } />
-              {/* <Route exact path='/callback' render={(props) => <Callback props={props} /> } /> */}
+              <Route exact path='/playlistcreated' render={(props) => <PlaylistCreated props={props} /> } />
               <Redirect to='/' />
             </Switch>
           </HashRouter>
-          <Grid container justify='center'>
-            <Button><a href='/login'>Create Playlist</a></Button>
-          </Grid>
         </Grid>
       </CssBaseline>
       <ToastContainer autoClose={1500} />
