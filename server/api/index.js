@@ -229,78 +229,82 @@ app.get('/login', (req, res) => {
     '?response_type=code' +
     '&client_id=' + process.env.SPOTIFY_KEY +
     (scopes ? '&scope=' + encodeURIComponent(scopes) : '') +
-    // '&redirect_uri=' + encodeURIComponent('https://diginkey.herokuapp.com/api/callback'));
-    '&redirect_uri=' + encodeURIComponent('http://localhost:3000/api/callback'));
+    '&redirect_uri=' + encodeURIComponent('https://diginkey.herokuapp.com/api/callback'));
+    // '&redirect_uri=' + encodeURIComponent('http://localhost:3000/api/callback'));
 });
 
 app.get('/api/callback', (req, res) => {
-
-  const headers = {
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    auth: {
-      username: process.env.SPOTIFY_KEY,
-      password: process.env.SPOTIFY_SECRET,
-    },
-  };
-  const body = {
-    grant_type: 'authorization_code',
-    code: req.query.code,
-    // redirect_uri: 'https://diginkey.herokuapp.com/api/callback',
-    redirect_uri: 'http://localhost:3000/api/callback',
-  };
-
-    axios.post(
-      'https://accounts.spotify.com/api/token',
-      qs.stringify(body),
-      headers
-    ).then(response => {
-      const accessToken = response.data.access_token;
-      axios.get(
-        'https://api.spotify.com/v1/me',
-        {
-          headers: {
-            "Authorization": "Bearer " + accessToken
-          }
-        }
+  try {
+    const headers = {
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      auth: {
+        username: process.env.SPOTIFY_KEY,
+        password: process.env.SPOTIFY_SECRET,
+      },
+    };
+    const body = {
+      grant_type: 'authorization_code',
+      code: req.query.code,
+      redirect_uri: 'https://diginkey.herokuapp.com/api/callback',
+      // redirect_uri: 'http://localhost:3000/api/callback',
+    };
+  
+      axios.post(
+        'https://accounts.spotify.com/api/token',
+        qs.stringify(body),
+        headers
       ).then(response => {
-        const userId = response.data.id;
-        axios.post(
-          `https://api.spotify.com/v1/users/${userId}/playlists`,
+        const accessToken = response.data.access_token;
+        axios.get(
+          'https://api.spotify.com/v1/me',
           {
-            name: `digInKey Playlist ${moment().format('MM/DD/YYYY')}`,
-            description: 'A harmonically compatbile playlist made with digInKey'
-            
-          }, {
             headers: {
               "Authorization": "Bearer " + accessToken
             }
           }
-        ).then(async response => {
-          const playlistId = response.data.id;
-          let songs = await Song.findAll({where: { sessionId: req.session_id }, raw: true})
-          songs = songs.map(song => song.uri)
+        ).then(response => {
+          const userId = response.data.id;
           axios.post(
-            `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
+            `https://api.spotify.com/v1/users/${userId}/playlists`,
             {
-              "uris": songs,
+              name: `digInKey Playlist ${moment().format('MM/DD/YYYY')}`,
+              description: 'A harmonically compatbile playlist made with digInKey'
+              
             }, {
               headers: {
                 "Authorization": "Bearer " + accessToken
               }
             }
           ).then(async response => {
-            await Song.destroy({ where: { sessionId: req.session_id }});
-            
+            const playlistId = response.data.id;
+            let songs = await Song.findAll({where: { sessionId: req.session_id }, raw: true})
+            songs = songs.map(song => song.uri)
+            axios.post(
+              `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
+              {
+                "uris": songs,
+              }, {
+                headers: {
+                  "Authorization": "Bearer " + accessToken
+                }
+              }
+            ).then(async response => {
+              await Song.destroy({ where: { sessionId: req.session_id }});
+              
+            })
+  
           })
-
+  
         })
-
       })
-    })
-    res.redirect('/#/playlistcreated');
+      res.redirect('/#/playlistcreated');
+  } catch (e) {
+    res.redirect('/#/playlisterror')
+  }
+
 
 })
 

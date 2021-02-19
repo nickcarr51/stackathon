@@ -4,7 +4,7 @@ import { CssBaseline, Grid } from '@material-ui/core';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { connect } from 'react-redux';
-import { Search, Dig, PlaylistCreated } from './components/index';
+import { Search, Dig, PlaylistCreated, PlaylistError } from './components/index';
 import { login } from './redux/actions';
 import NavBar from './components/navbar/navbar';
 
@@ -19,6 +19,7 @@ const App = () => {
               <Route exact path='/' render={(props) => <Search props={props} /> } />
               <Route path='/dig/:id?' render={(props) => <Dig props={props} /> } />
               <Route exact path='/playlistcreated' render={(props) => <PlaylistCreated props={props} /> } />
+              <Route exact path='/playlistcreated' render={(props) => <PlaylistError props={props} /> } />
               <Redirect to='/' />
             </Switch>
           </HashRouter>
