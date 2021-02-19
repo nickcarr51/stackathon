@@ -229,8 +229,8 @@ app.get('/login', (req, res) => {
     '?response_type=code' +
     '&client_id=' + process.env.SPOTIFY_KEY +
     (scopes ? '&scope=' + encodeURIComponent(scopes) : '') +
-    '&redirect_uri=' + encodeURIComponent('https://diginkey.herokuapp.com/api/callback'));
-    // '&redirect_uri=' + encodeURIComponent('http://localhost:3000/api/callback'));
+    // '&redirect_uri=' + encodeURIComponent('https://diginkey.herokuapp.com/api/callback'));
+    '&redirect_uri=' + encodeURIComponent('http://localhost:3000/api/callback'));
 });
 
 app.get('/api/callback', (req, res) => {
@@ -248,8 +248,8 @@ app.get('/api/callback', (req, res) => {
   const body = {
     grant_type: 'authorization_code',
     code: req.query.code,
-    redirect_uri: 'https://diginkey.herokuapp.com/api/callback',
-    // redirect_uri: 'http://localhost:3000/api/callback',
+    // redirect_uri: 'https://diginkey.herokuapp.com/api/callback',
+    redirect_uri: 'http://localhost:3000/api/callback',
   };
 
     axios.post(

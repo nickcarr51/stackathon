@@ -57,6 +57,8 @@ const SearchSongCard = ({ track, trackInfo, addToPlaylist, camelot }) => {
   }
 
   const classes = useStyles();
+  const embedURL = `https://open.spotify.com/embed/track/${track.uri}`;
+  const IFRAME = `<iframe src="https://open.spotify.com/embed/track/${embedURL}" width="300" height="80" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>`
   return (
     <Grid className={classes.songGrid} container justify='space-between'>
       <Grid className={classes.topRow} item container direction='row' justifycontent='space-apart' xs={12}>
@@ -77,7 +79,7 @@ const SearchSongCard = ({ track, trackInfo, addToPlaylist, camelot }) => {
       <Grid className={classes.bottomRow} container item direction='row' justify='space-between' xs={12}>
         <Grid container item xs={12} sm={12} md={6} lg={6}>
           <div style={{padding: '10px'}}>
-          <SpotifyPlayer uri={track.uri} size='compact' view='coverart' theme='white' />
+            <iframe src={`https://open.spotify.com/embed/track/${track.id}`} width="300" height="80" frameBorder="0" allowtransparency="true" allow="encrypted-media"></iframe>
           </div>
         </Grid>
         <Grid container item direction='row' xs={12} sm={12} md={6} lg={6}>

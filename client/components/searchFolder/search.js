@@ -2,14 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { initSearch, clearSearch, getPlaylist } from '../../redux/actions';
 import { makeStyles } from '@material-ui/core/styles';
-import { Paper, TextField, Button, Grid, Accordion, AccordionSummary, AccordionDetails, Typography } from '@material-ui/core';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import { Paper, TextField, Button, Grid } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
-import Spotify_Icon_CMYK_White from '../../../public/assets/images/Spotify_Icon_CMYK_White.png';
 import SearchResults from './searchResults';
-import Playlist from '../playlist/playlist';
-import SongEnergy from '../songEnergyChart/songEnergy';
-import SongDanceability from '../songEnergyChart/danceabilityChart';
+import PlaylistDisplay from '../playlist/playlistDisplay';
 
 const useStyles = makeStyles((theme) => ({
   textField: {
@@ -73,36 +69,7 @@ const Search = ({ initSearch, initSearchResults, initSearchInfo, currPlaylist, c
       </Grid>
       {
         currPlaylist.length
-        ? <Grid container direction='column' alignItems='center' justify='center'>
-            <Grid item lg={5} md={8} sm={12} style={{ width: '100%', margin: '10px 0px'}} >
-              <Accordion>
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography>Playlist</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <Playlist />
-                </AccordionDetails>
-              </Accordion>
-            </Grid>
-            <Grid item lg={5} md={8} sm={12} style={{ width: '100%', margin: '10px 0px' }} >
-              <Accordion>
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography>Insights</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <Grid container direction='column'>
-                    <Typography>Energy</Typography>
-                    <SongEnergy currPlaylist={currPlaylist} />
-                    <Typography>Danceability</Typography>
-                    <SongDanceability currPlaylist={currPlaylist} />
-                  </Grid>
-                </AccordionDetails>
-              </Accordion>
-            </Grid>
-            <Grid container justify='center'>
-              <a className='spotifyButton' href='/login'><Button className={classes.button}>Create Playlist<img className='spotifyIcon' src={Spotify_Icon_CMYK_White} /></Button></a>
-            </Grid>
-          </Grid>
+        ? <PlaylistDisplay currPlaylist={currPlaylist} />
         : null
       }
     </Grid>
