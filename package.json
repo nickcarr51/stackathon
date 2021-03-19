@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node server/api/index.js",
-    "build": "webpack --mode=\"production\"",
+    "build": "webpack",
     "build:watch": "webpack --watch",
     "start:server": "node-dev --respawn ./server/api/index.js",
     "start:dev": "npm run build:watch & npm run start:server"
