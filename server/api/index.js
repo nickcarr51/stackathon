@@ -1,7 +1,6 @@
 require('dotenv').config();
 const path = require('path');
 const express = require('express');
-require('express-async-errors');
 const chalk = require('chalk');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
