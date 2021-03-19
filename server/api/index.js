@@ -387,11 +387,7 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500).send(err.message || 'Internal server error.')
 })
 
-db.sync()
-  .then(() => {
-    app.listen(PORT, () => {
-      console.log(chalk.greenBright(`Server is now listening on PORT:${PORT}`));
-    });
-  })
-  .catch(e => console.error(e));
+app.listen(PORT, () => {
+  console.log(chalk.greenBright(`Server is now listening on PORT:${PORT}`));
+});
 
