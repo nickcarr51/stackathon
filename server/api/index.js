@@ -82,6 +82,7 @@ app.post('/api/initsearch', (req, res, next) => {
         res.send(response.data.tracks.items);
       })  
     })
+    .catch(e => next(e));
   } catch (e) {
     next(e);
   }
@@ -107,6 +108,7 @@ app.post('/api/initsearchinfo', (req, res, next) => {
         res.send(response.data.audio_features);
       })
     })
+    .catch(e => next(e))
   } catch(e) {
     next(e);
   }
@@ -132,6 +134,7 @@ app.post('/api/gettrack', (req, res, next) => {
         res.send(response.data);
       })
     })
+    .catch(e => next(e))
   } catch (e) {
     next(e);
   }
@@ -157,6 +160,7 @@ app.post('/api/getinfo', (req, res, next) => {
         res.send(response.data);
       })
     })
+    .catch(e => next(e))
   } catch(e) {
     next(e);
   }
@@ -182,6 +186,7 @@ app.post('/api/getsimilar', (req, res, next) => {
         res.send(response.data.tracks);
       })
     })
+    .catch(e => next(e))
   } catch(e) {
     next(e);
   }
@@ -207,6 +212,7 @@ app.post('/api/getsimilarinfo', (req, res, next) => {
         res.send(response.data.audio_features);
       })
     })
+    .catch(e => next(e))
   } catch(e) {
     next(e);
   } 
@@ -350,6 +356,7 @@ app.get('/api/callback', (req, res) => {
   
         })
       })
+      .catch(e => next(e))
       res.redirect('/#/playlistcreated');
   } catch (e) {
     res.redirect('/#/playlisterror')
@@ -386,4 +393,5 @@ db.sync()
       console.log(chalk.greenBright(`Server is now listening on PORT:${PORT}`));
     });
   })
+  .catch(e => console.error(e));
 
