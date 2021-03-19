@@ -373,7 +373,7 @@ app.post('/api/sendhome', (req, res, next) => {
   }
 })
 
-app.get('*', (req, res, next) => {
+app.get('/', (req, res, next) => {
   try {
     res.sendFile(path.join(__dirname, '../../public/index.html'));
   } catch(e) {
