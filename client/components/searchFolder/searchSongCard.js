@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 import PlaylistAddIcon from '@material-ui/icons/PlaylistAdd'
 import { Link } from 'react-router-dom';
-import SpotifyPlayer from 'react-spotify-player';
 import { getKey } from 'camelot-wheel';
 import { addToPlaylist } from '../../redux/actions';
 import { truncateSixty, truncateThirty } from '../../utils';

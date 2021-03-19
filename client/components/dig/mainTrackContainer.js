@@ -6,7 +6,6 @@ import { Grid, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import ShuffleIcon from '@material-ui/icons/Shuffle';
 import PlaylistAddIcon from '@material-ui/icons/PlaylistAdd';
-import SpotifyPlayer from 'react-spotify-player';
 
 const useStyles = makeStyles((theme) => ({
   songGrid: {
