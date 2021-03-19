@@ -14,6 +14,11 @@ const PORT = process.env.PORT || 3000;
 const PUBLIC_PATH = path.join(__dirname, '../../public');
 const DIST_PATH = path.join(__dirname, '../../dist');
 
+app.use(express.json());
+app.use(cors());
+app.use(express.static(PUBLIC_PATH));
+app.use(express.static(DIST_PATH));
+
 app.use(cookieParser());
 
 app.use(async (req, res, next) => {
@@ -37,10 +42,6 @@ app.use(async (req, res, next) => {
   }
 });
 
-app.use(express.json());
-app.use(cors());
-app.use(express.static(PUBLIC_PATH));
-app.use(express.static(DIST_PATH));
 
 const headers = {
   headers: {
