@@ -6,8 +6,9 @@ const DATABASE_URL = process.env.DATABASE_URL || 'postgres://localhost:5432/digI
 
 const db = new Sequelize(DATABASE_URL, {
   logging: false,
-  ssl: {
-    rejectUnauthorized: false,
+  ssl: true,
+  dialectOptions: {
+    ssl: true,
   },
 });
 
