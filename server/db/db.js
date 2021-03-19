@@ -4,13 +4,29 @@ const { UUID, UUIDV4, STRING, ARRAY, FLOAT, INTEGER } = Sequelize;
 
 const DATABASE_URL = process.env.DATABASE_URL || 'postgres://localhost:5432/digInKey';
 
-const db = new Sequelize(DATABASE_URL, {
-  logging: false,
-  ssl: true,
-  dialectOptions: {
+let config;
+if (process.env.DATABASE_URL) {
+  config = {
+    logging: false,
+    operatorsAliases: false,
+    dialect: "postgres",
+    protocol: "postgres",
     ssl: true,
-  },
-});
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false,
+      },
+    },
+  }
+} else {
+  config = {
+    logging: false,
+    operatorsAliases: false,
+  }
+}
+
+const db = new Sequelize(DATABASE_URL, config);
 
 const Session = db.define('session', {
   id: {
