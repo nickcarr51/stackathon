@@ -62,7 +62,7 @@ const data = {
   grant_type: 'client_credentials',
 };
 
-app.post('/api/initsearch', (req, res, next) => {
+app.post('/api/initsearch', (req, res) => {
   try {
     const { input } = req.body;
     axios.post(
@@ -84,7 +84,7 @@ app.post('/api/initsearch', (req, res, next) => {
     })
     .catch(e => next(e));
   } catch (e) {
-    next(e);
+    console.log(e);
   }
 })
 
