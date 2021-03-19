@@ -22,27 +22,23 @@ app.use(express.static(DIST_PATH));
 app.use(cookieParser());
 
 app.use(async (req, res, next) => {
-  try {
-    if (!req.cookies.session_id) {
-      const session = await Session.create();
-  
-      const oneWeek = 1000 * 60 * 60 * 24 * 7;
-  
-      res.cookie('session_id', session.id, {
-        path: '/',
-        expires: new Date(Date.now() + oneWeek),
-      });
-  
-      req.session_id = session.id;
-  
-      next();
-    } else {
-      req.session_id = req.cookies.session_id;
-  
-      next();
-    }
-  } catch (e) {
-    next(e);
+  if (!req.cookies.session_id) {
+    const session = await Session.create();
+
+    const oneWeek = 1000 * 60 * 60 * 24 * 7;
+
+    res.cookie('session_id', session.id, {
+      path: '/',
+      expires: new Date(Date.now() + oneWeek),
+    });
+
+    req.session_id = session.id;
+
+    next();
+  } else {
+    req.session_id = req.cookies.session_id;
+
+    next();
   }
 });
 
