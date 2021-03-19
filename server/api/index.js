@@ -23,23 +23,27 @@ app.use(express.static(DIST_PATH));
 app.use(cookieParser());
 
 app.use(async (req, res, next) => {
-  if (!req.cookies.session_id) {
-    const session = await Session.create();
-
-    const oneWeek = 1000 * 60 * 60 * 24 * 7;
-
-    res.cookie('session_id', session.id, {
-      path: '/',
-      expires: new Date(Date.now() + oneWeek),
-    });
-
-    req.session_id = session.id;
-
-    next();
-  } else {
-    req.session_id = req.cookies.session_id;
-
-    next();
+  try {
+    if (!req.cookies.session_id) {
+      const session = await Session.create();
+  
+      const oneWeek = 1000 * 60 * 60 * 24 * 7;
+  
+      res.cookie('session_id', session.id, {
+        path: '/',
+        expires: new Date(Date.now() + oneWeek),
+      });
+  
+      req.session_id = session.id;
+  
+      next();
+    } else {
+      req.session_id = req.cookies.session_id;
+  
+      next();
+    }
+  } catch (e) {
+    next(e);
   }
 });
 
@@ -58,181 +62,225 @@ const data = {
   grant_type: 'client_credentials',
 };
 
-app.post('/api/initsearch', (req, res) => {
-  const { input } = req.body;
-  axios.post(
-    'https://accounts.spotify.com/api/token',
-    qs.stringify(data),
-    headers
-  ).then(response => {
-    const accessToken = response.data.access_token;
-    axios.get(
-      `https://api.spotify.com/v1/search?q=${ encodeURI(input) }&type=track`,
-      {
-        headers: {
-            "Authorization": "Bearer " + accessToken
-        }
-      }
+app.post('/api/initsearch', (req, res, next) => {
+  try {
+    const { input } = req.body;
+    axios.post(
+      'https://accounts.spotify.com/api/token',
+      qs.stringify(data),
+      headers
     ).then(response => {
-      res.send(response.data.tracks.items);
-    })  
-  })
-})
-
-app.post('/api/initsearchinfo', (req, res) => {
-  const { ids } = req.body;
-  axios.post(
-    'https://accounts.spotify.com/api/token',
-    qs.stringify(data),
-    headers
-  ).then(response => {
-    const accessToken = response.data.access_token;
-    axios.get(
-      `https://api.spotify.com/v1/audio-features/?ids=${ids}`,
-      {
-        headers: {
-          "Authorization": "Bearer " + accessToken
+      const accessToken = response.data.access_token;
+      axios.get(
+        `https://api.spotify.com/v1/search?q=${ encodeURI(input) }&type=track`,
+        {
+          headers: {
+              "Authorization": "Bearer " + accessToken
+          }
         }
-      }
-    ).then(response => {
-      res.send(response.data.audio_features);
+      ).then(response => {
+        res.send(response.data.tracks.items);
+      })  
     })
-  })
-})
-
-app.post('/api/gettrack', (req, res) => {
-  const { id } = req.body;
-  axios.post(
-    'https://accounts.spotify.com/api/token',
-    qs.stringify(data),
-    headers
-  ).then(response => {
-    const accessToken = response.data.access_token;
-    axios.get(
-      `https://api.spotify.com/v1/tracks/${id}`,
-      {
-        headers: {
-          "Authorization": "Bearer " + accessToken
-        }
-      }
-    ).then(response => {
-      res.send(response.data);
-    })
-  })
-})
-
-app.post('/api/getinfo', (req, res) => {
-  const { id } = req.body;
-  axios.post(
-    'https://accounts.spotify.com/api/token',
-    qs.stringify(data),
-    headers
-  ).then(response => {
-    const accessToken = response.data.access_token;
-    axios.get(
-      `https://api.spotify.com/v1/audio-features/${id}`,
-      {
-        headers: {
-          "Authorization": "Bearer " + accessToken
-        }
-      }
-    ).then(response => {
-      res.send(response.data);
-    })
-  })
-})
-
-app.post('/api/getsimilar', (req, res) => {
-  const { id } = req.body;
-  axios.post(
-    'https://accounts.spotify.com/api/token',
-    qs.stringify(data),
-    headers
-  ).then(response => {
-    const accessToken = response.data.access_token;
-    axios.get(
-      `https://api.spotify.com/v1/recommendations?limit=100&seed_tracks=${id}`,
-      {
-        headers: {
-          "Authorization": "Bearer " + accessToken
-        }
-      }
-    ).then(response => {
-      res.send(response.data.tracks);
-    })
-  })
-})
-
-app.post('/api/getsimilarinfo', (req, res) => {
-  const { ids } = req.body;
-  axios.post(
-    'https://accounts.spotify.com/api/token',
-    qs.stringify(data),
-    headers
-  ).then(response => {
-    const accessToken = response.data.access_token
-    axios.get(
-      `https://api.spotify.com/v1/audio-features/?ids=${ids}`,
-      {
-        headers: {
-          "Authorization": "Bearer " + accessToken
-        }
-      }
-    ).then(response => {
-      res.send(response.data.audio_features);
-    })
-  })
-})
-
-app.post('/api/addtoplaylist', async (req, res) => {
-  const { track, trackInfo, currKey } = req.body;
-  let camelotKey;
-  if (currKey.mode === 0) {
-    camelotKey = currKey.camelotPosition + 'A'
-  } else {
-    camelotKey = currKey.camelotPosition + 'B'
+  } catch (e) {
+    next(e);
   }
-  const song = await Song.create({
-    name: track.name,
-    songId: track.id,
-    artists: track.artists.map(artist => artist.name),
-    energy: trackInfo.energy,
-    danceability: trackInfo.danceability,
-    key: currKey.name,
-    camelotKey: camelotKey,
-    tempo: Math.floor(trackInfo.tempo),
-    uri: track.uri,
-    sessionId: req.session_id
-  })
-
-  res.send(song);
 })
 
-app.get('/api/getplaylist', async (req, res) => {
-  const playlist = await Song.findAll({ where: { sessionId: req.session_id }});
-  res.send(playlist);
+app.post('/api/initsearchinfo', (req, res, next) => {
+  try {
+    const { ids } = req.body;
+    axios.post(
+      'https://accounts.spotify.com/api/token',
+      qs.stringify(data),
+      headers
+    ).then(response => {
+      const accessToken = response.data.access_token;
+      axios.get(
+        `https://api.spotify.com/v1/audio-features/?ids=${ids}`,
+        {
+          headers: {
+            "Authorization": "Bearer " + accessToken
+          }
+        }
+      ).then(response => {
+        res.send(response.data.audio_features);
+      })
+    })
+  } catch(e) {
+    next(e);
+  }
 })
 
-app.delete('/api/deletefromplaylist/:id', async (req, res) => {
-  const { id } = req.params;
-  await Song.destroy({ where: { songId: id, sessionId: req.session_id }});
-  res.send(id);
+app.post('/api/gettrack', (req, res, next) => {
+  try {
+    const { id } = req.body;
+    axios.post(
+      'https://accounts.spotify.com/api/token',
+      qs.stringify(data),
+      headers
+    ).then(response => {
+      const accessToken = response.data.access_token;
+      axios.get(
+        `https://api.spotify.com/v1/tracks/${id}`,
+        {
+          headers: {
+            "Authorization": "Bearer " + accessToken
+          }
+        }
+      ).then(response => {
+        res.send(response.data);
+      })
+    })
+  } catch (e) {
+    next(e);
+  }
 })
 
-app.delete('/api/clearplaylist', async (req, res) => {
-  await Song.destroy({ where: { sessionId: req.session_id }});
-  res.sendStatus(200);
+app.post('/api/getinfo', (req, res, next) => {
+  try {
+    const { id } = req.body;
+    axios.post(
+      'https://accounts.spotify.com/api/token',
+      qs.stringify(data),
+      headers
+    ).then(response => {
+      const accessToken = response.data.access_token;
+      axios.get(
+        `https://api.spotify.com/v1/audio-features/${id}`,
+        {
+          headers: {
+            "Authorization": "Bearer " + accessToken
+          }
+        }
+      ).then(response => {
+        res.send(response.data);
+      })
+    })
+  } catch(e) {
+    next(e);
+  }
+})
+
+app.post('/api/getsimilar', (req, res, next) => {
+  try {
+    const { id } = req.body;
+    axios.post(
+      'https://accounts.spotify.com/api/token',
+      qs.stringify(data),
+      headers
+    ).then(response => {
+      const accessToken = response.data.access_token;
+      axios.get(
+        `https://api.spotify.com/v1/recommendations?limit=100&seed_tracks=${id}`,
+        {
+          headers: {
+            "Authorization": "Bearer " + accessToken
+          }
+        }
+      ).then(response => {
+        res.send(response.data.tracks);
+      })
+    })
+  } catch(e) {
+    next(e);
+  }
+})
+
+app.post('/api/getsimilarinfo', (req, res, next) => {
+  try {
+    const { ids } = req.body;
+    axios.post(
+      'https://accounts.spotify.com/api/token',
+      qs.stringify(data),
+      headers
+    ).then(response => {
+      const accessToken = response.data.access_token
+      axios.get(
+        `https://api.spotify.com/v1/audio-features/?ids=${ids}`,
+        {
+          headers: {
+            "Authorization": "Bearer " + accessToken
+          }
+        }
+      ).then(response => {
+        res.send(response.data.audio_features);
+      })
+    })
+  } catch(e) {
+    next(e);
+  } 
+})
+
+app.post('/api/addtoplaylist', async (req, res, next) => {
+  try {
+    const { track, trackInfo, currKey } = req.body;
+    let camelotKey;
+    if (currKey.mode === 0) {
+      camelotKey = currKey.camelotPosition + 'A'
+    } else {
+      camelotKey = currKey.camelotPosition + 'B'
+    }
+    const song = await Song.create({
+      name: track.name,
+      songId: track.id,
+      artists: track.artists.map(artist => artist.name),
+      energy: trackInfo.energy,
+      danceability: trackInfo.danceability,
+      key: currKey.name,
+      camelotKey: camelotKey,
+      tempo: Math.floor(trackInfo.tempo),
+      uri: track.uri,
+      sessionId: req.session_id
+    })
+  
+    res.send(song);
+  } catch(e) {
+    next(e);
+  }
+})
+
+app.get('/api/getplaylist', async (req, res, next) => {
+  try {
+    const playlist = await Song.findAll({ where: { sessionId: req.session_id }});
+    res.send(playlist);
+  } catch(e) {
+    next(e);
+  }
+})
+
+app.delete('/api/deletefromplaylist/:id', async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    await Song.destroy({ where: { songId: id, sessionId: req.session_id }});
+    res.send(id);
+  } catch(e) {
+    next(e);
+  }
+})
+
+app.delete('/api/clearplaylist', async (req, res, next) => {
+  try {
+    await Song.destroy({ where: { sessionId: req.session_id }});
+    res.sendStatus(200);
+  } catch(e) {
+    next(e);
+  }
 })
 
 
-app.get('/login', (req, res) => {
-  const scopes = 'user-read-private user-read-email playlist-modify-public playlist-modify-private playlist-read-private';
-  res.redirect('https://accounts.spotify.com/authorize' +
-    '?response_type=code' +
-    '&client_id=' + process.env.SPOTIFY_KEY +
-    (scopes ? '&scope=' + encodeURIComponent(scopes) : '') +
-    '&redirect_uri=' + encodeURIComponent('https://diginkey.herokuapp.com/api/callback'));
-    // '&redirect_uri=' + encodeURIComponent('http://localhost:3000/api/callback'));
+app.get('/login', (req, res, next) => {
+  try {
+    const scopes = 'user-read-private user-read-email playlist-modify-public playlist-modify-private playlist-read-private';
+    res.redirect('https://accounts.spotify.com/authorize' +
+      '?response_type=code' +
+      '&client_id=' + process.env.SPOTIFY_KEY +
+      (scopes ? '&scope=' + encodeURIComponent(scopes) : '') +
+      '&redirect_uri=' + encodeURIComponent('https://diginkey.herokuapp.com/api/callback'));
+      // '&redirect_uri=' + encodeURIComponent('http://localhost:3000/api/callback'));
+  } catch(e) {
+    next(e);
+  }
 });
 
 app.get('/api/callback', (req, res) => {
@@ -310,13 +358,27 @@ app.get('/api/callback', (req, res) => {
 
 })
 
-app.post('/api/sendhome', (req, res) => {
-  res.redirect('/');
+app.post('/api/sendhome', (req, res, next) => {
+  try {
+    res.redirect('/');
+  } catch(e) {
+    next(e);
+  }
 })
 
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../../public/index.html'));
+app.get('*', (req, res, next) => {
+  try {
+    res.sendFile(path.join(__dirname, '../../public/index.html'));
+  } catch(e) {
+    next(e);
+  }
 });
+
+app.use((err, req, res, next) => {
+  console.error(err)
+  console.error(err.stack)
+  res.status(err.status || 500).send(err.message || 'Internal server error.')
+})
 
 db.sync()
   .then(() => {
